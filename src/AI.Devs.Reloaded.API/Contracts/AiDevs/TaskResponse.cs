@@ -1,8 +1,9 @@
-﻿namespace AI.Devs.Reloaded.API.Contracts;
+﻿namespace AI.Devs.Reloaded.API.Contracts.AiDevs;
 
 public class TaskResponse
 {
     public int code { get; set; }
     public string? msg { get; set; }
     public string? cookie { get; set; }
+    public List<string>? input { get; set; }
 }

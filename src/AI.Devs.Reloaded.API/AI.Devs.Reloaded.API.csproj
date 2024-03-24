@@ -12,4 +12,8 @@
     <PackageReference Include="Swashbuckle.AspNetCore" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Contracts\AiDevs\" />
+  </ItemGroup>
+
 </Project>
