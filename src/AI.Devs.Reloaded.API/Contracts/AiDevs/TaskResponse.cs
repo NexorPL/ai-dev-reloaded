@@ -6,4 +6,5 @@ public class TaskResponse
     public string? msg { get; set; }
     public string? cookie { get; set; }
     public List<string>? input { get; set; }
+    public List<string>? blog { get; set; }
 }

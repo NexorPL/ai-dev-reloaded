@@ -1,4 +1,8 @@
-﻿using AI.Devs.Reloaded.API.HttpClients.Abstractions;
+﻿using System.Text.Json;
+using AI.Devs.Reloaded.API.HttpClients.Abstractions;
+using AI.Devs.Reloaded.API.Models.OpenAi;
+using AI.Devs.Reloaded.API.Models.OpenAi.Extensions;
+using AI.Devs.Reloaded.API.Utils;
 
 namespace AI.Devs.Reloaded.API.Tasks;
 
@@ -18,6 +22,13 @@ public static class TasksModules
             async (IOpenAiClient openAiClient, ITaskClient client, CancellationToken ct) => await Moderation(openAiClient, client, ct)
         )
         .WithName("moderation")
+        .WithOpenApi();
+
+        app.MapGet(
+            "/blogger",
+            async (IOpenAiClient openAiClient, ITaskClient client, CancellationToken ct) => await Blogger(openAiClient, client, ct)
+        )
+        .WithName("blogger")
         .WithOpenApi();
     }
 
@@ -54,5 +65,22 @@ public static class TasksModules
         var answer = await client.SendAnswerAsync(token, answers, linkedCts.Token);
 
         return Results.Ok(answer);
+    }
+
+    private static async Task<IResult> Blogger(IOpenAiClient openAiClient, ITaskClient client, CancellationToken ct = default)
+    {
+        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(60));
+        using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(ct, cts.Token);
+
+        var token = await client.GetTokenAsync("blogger", linkedCts.Token);
+        var task = await client.GetTaskAsync(token, linkedCts.Token);
+        var input = string.Join(". ", task.blog!);
+        var response = await openAiClient.Completions(input, linkedCts.Token);
+        var contentJson = response.choices.Single(x => x.message.role == "assistant").message.content;
+        var content = JsonSerializer.Deserialize<List<BloggerRsponse>>(contentJson);
+        var answers = content!.AsTextList();
+        var answer = await client.SendAnswerAsync(token, answers, linkedCts.Token);
+
+        return Results.Ok(answers);
     }
 }

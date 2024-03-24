@@ -1,0 +1,17 @@
+﻿namespace AI.Devs.Reloaded.API.Utils.Consts;
+
+public class OpenAiApi
+{
+    public class Roles
+    {
+        public const string
+            User = "user",
+            System = "system"
+            ;
+    }
+
+    public class ModelsGpt
+    {
+        public const string Gpt4 = "gpt-4";
+    }
+}

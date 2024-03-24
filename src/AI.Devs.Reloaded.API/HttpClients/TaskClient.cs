@@ -1,8 +1,8 @@
 ﻿using System.Text.Json;
 using AI.Devs.Reloaded.API.Configurations;
 using AI.Devs.Reloaded.API.Contracts.AiDevs;
-using AI.Devs.Reloaded.API.Contracts.Answer.AiDevs;
-using AI.Devs.Reloaded.API.Contracts.Token.AiDevs;
+using AI.Devs.Reloaded.API.Contracts.AiDevs.Answer;
+using AI.Devs.Reloaded.API.Contracts.AiDevs.Token;
 using AI.Devs.Reloaded.API.Exceptions;
 using AI.Devs.Reloaded.API.Extensions;
 using AI.Devs.Reloaded.API.HttpClients.Abstractions;

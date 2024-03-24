@@ -1,3 +1,3 @@
-﻿namespace AI.Devs.Reloaded.API.Contracts.Token.AiDevs;
+﻿namespace AI.Devs.Reloaded.API.Contracts.AiDevs.Token;
 
 public sealed record TokenRequest(string apikey) { }

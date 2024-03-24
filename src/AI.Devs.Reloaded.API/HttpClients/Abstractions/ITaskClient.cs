@@ -1,6 +1,5 @@
-﻿using AI.Devs.Reloaded.API.Contracts;
-using AI.Devs.Reloaded.API.Contracts.AiDevs;
-using AI.Devs.Reloaded.API.Contracts.Answer.AiDevs;
+﻿using AI.Devs.Reloaded.API.Contracts.AiDevs;
+using AI.Devs.Reloaded.API.Contracts.AiDevs.Answer;
 
 namespace AI.Devs.Reloaded.API.HttpClients.Abstractions;
 
