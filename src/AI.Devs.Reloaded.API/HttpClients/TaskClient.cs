@@ -6,6 +6,7 @@ using AI.Devs.Reloaded.API.Contracts.AiDevs.Token;
 using AI.Devs.Reloaded.API.Exceptions;
 using AI.Devs.Reloaded.API.Extensions;
 using AI.Devs.Reloaded.API.HttpClients.Abstractions;
+using AI.Devs.Reloaded.API.Utils;
 using Microsoft.Extensions.Options;
 
 namespace AI.Devs.Reloaded.API.HttpClients;
@@ -20,7 +21,7 @@ public class TaskClient(HttpClient httpClient, ILogger<TaskClient> logger, IOpti
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(_options.ApiKey, nameof(_options.ApiKey));
 
-        var uri = CreateRelativeUri($"token/{taskName}");
+        var uri = UriHelper.CreateRelativeUri($"token/{taskName}");
         var request = new TokenRequest(_options.ApiKey);
 
         try
@@ -54,7 +55,7 @@ public class TaskClient(HttpClient httpClient, ILogger<TaskClient> logger, IOpti
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(token, nameof(token));
 
-        var uri = CreateRelativeUri($"task/{token}");
+        var uri = UriHelper.CreateRelativeUri($"task/{token}");
         
         try
         {
@@ -83,12 +84,47 @@ public class TaskClient(HttpClient httpClient, ILogger<TaskClient> logger, IOpti
         throw new MissingTaskException();
     }
 
+    public async Task<TaskResponse> GetTaskPostAsync(string token, IEnumerable<KeyValuePair<string, string>> parameters, CancellationToken cancellationToken = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(token, nameof(token));
+        CustomArgumentExceptionExtensions.ThrowIfNull(parameters, nameof(parameters));
+
+        var uri = UriHelper.CreateRelativeUri($"/task/{token}");
+        var urlEncoded = new FormUrlEncodedContent(parameters);
+
+        try
+        {
+            var result = await _httpClient.PostAsync(uri, urlEncoded, cancellationToken);
+
+            if (result.IsSuccessStatusCode)
+            {
+                var content = await result.Content.ReadAsStringAsync(cancellationToken);
+
+                _logger.LogInformation("GetTaskPost - Response received from {0}: {1}", uri, content);
+
+                var response = JsonSerializer.Deserialize<TaskResponse>(content);
+                return response!;
+            }
+            else
+            {
+                _logger.LogInformation($"GetTaskPost - Failed to get task");
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "GetTaskPost - Error occured");
+            throw;
+        }
+
+        throw new MissingTaskException();
+    }
+
     public async Task<AnswerResponse> SendAnswerAsync<TModel>(string token, TModel answer, CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(token, nameof(token));
         CustomArgumentExceptionExtensions.ThrowIfNull(answer, nameof(answer));
 
-        var uri = CreateRelativeUri($"answer/{token}");
+        var uri = UriHelper.CreateRelativeUri($"answer/{token}");
         var request = new AnswerRequest<TModel>(answer);
 
         try
@@ -116,10 +152,5 @@ public class TaskClient(HttpClient httpClient, ILogger<TaskClient> logger, IOpti
         }
 
         throw new MissingAnswerException();
-    }
-
-    private static Uri CreateRelativeUri(string relativeUri)
-    {
-        return new Uri(relativeUri, UriKind.Relative);
     }
 }

@@ -12,6 +12,9 @@ public class OpenAiApi
 
     public class ModelsGpt
     {
-        public const string Gpt4 = "gpt-4";
+        public const string 
+            Gpt35Turbo = "gpt-3.5-turbo",
+            Gpt4 = "gpt-4"
+            ;
     }
 }

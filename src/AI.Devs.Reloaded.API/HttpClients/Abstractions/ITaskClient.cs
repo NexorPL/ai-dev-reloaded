@@ -7,5 +7,6 @@ public interface ITaskClient
 {
     Task<string> GetTokenAsync(string taskName, CancellationToken cancellationToken = default);
     Task<TaskResponse> GetTaskAsync(string token, CancellationToken cancellationToken = default);
+    Task<TaskResponse> GetTaskPostAsync(string token, IEnumerable<KeyValuePair<string, string>> content, CancellationToken cancellationToken = default);
     Task<AnswerResponse> SendAnswerAsync<TModel>(string token, TModel answer, CancellationToken cancellationToken = default);
 }

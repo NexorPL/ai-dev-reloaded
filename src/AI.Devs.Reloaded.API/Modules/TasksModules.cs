@@ -30,6 +30,13 @@ public static class TasksModules
         )
         .WithName("blogger")
         .WithOpenApi();
+
+        app.MapGet(
+            "/liar",
+            async (IOpenAiClient openAiClient, ITaskClient client, CancellationToken ct) => await Liar(openAiClient, client, ct)
+        )
+        .WithName("liar")
+        .WithOpenApi();
     }
 
     private static async Task<IResult> HelloApi(ITaskClient client, CancellationToken ct = default)
@@ -56,7 +63,7 @@ public static class TasksModules
 
         foreach (var input in task.input!)
         {
-            var response = await openAiClient.Moderation(input, linkedCts.Token);
+            var response = await openAiClient.ModerationAsync(input, linkedCts.Token);
             var anyFlagged = response.results.Any(r => r.Flagged) ? 1 : 0;
 
             answers.Add(anyFlagged);
@@ -75,12 +82,33 @@ public static class TasksModules
         var token = await client.GetTokenAsync("blogger", linkedCts.Token);
         var task = await client.GetTaskAsync(token, linkedCts.Token);
         var input = string.Join(". ", task.blog!);
-        var response = await openAiClient.Completions(input, linkedCts.Token);
+        var response = await openAiClient.CompletionsAsync(input, linkedCts.Token);
         var contentJson = response.choices.Single(x => x.message.role == "assistant").message.content;
         var content = JsonSerializer.Deserialize<List<BloggerRsponse>>(contentJson);
         var answers = content!.AsTextList();
         var answer = await client.SendAnswerAsync(token, answers, linkedCts.Token);
 
-        return Results.Ok(answers);
+        return Results.Ok(answer);
+    }
+
+    private static async Task<IResult> Liar(IOpenAiClient openAiClient, ITaskClient client, CancellationToken ct = default)
+    {
+        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(60));
+        using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(ct, cts.Token);
+
+        var question = "Which river flow through Szczecin? Short Answer";
+        var taskParamters = new List<KeyValuePair<string, string>>() 
+        { 
+            new("question", question) 
+        };
+
+        var token = await client.GetTokenAsync("liar", linkedCts.Token);
+        var task = await client.GetTaskPostAsync(token, taskParamters, linkedCts.Token);
+        var fullInput = $"{question} {task.answer!}";
+        var response = await openAiClient.GuardrailsAsync(fullInput, linkedCts.Token);
+        var content = response.choices.Single(x => x.message.role == "assistant").message.content;
+        var answer = await client.SendAnswerAsync(token, content, linkedCts.Token);
+
+        return Results.Ok(answer);
     }
 }
