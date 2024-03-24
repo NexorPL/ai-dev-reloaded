@@ -1,8 +1,8 @@
 ﻿using System.Text.Json;
 using AI.Devs.Reloaded.API.Configurations;
-using AI.Devs.Reloaded.API.Contracts;
-using AI.Devs.Reloaded.API.Contracts.Answer;
-using AI.Devs.Reloaded.API.Contracts.Token;
+using AI.Devs.Reloaded.API.Contracts.AiDevs;
+using AI.Devs.Reloaded.API.Contracts.Answer.AiDevs;
+using AI.Devs.Reloaded.API.Contracts.Token.AiDevs;
 using AI.Devs.Reloaded.API.Exceptions;
 using AI.Devs.Reloaded.API.Extensions;
 using AI.Devs.Reloaded.API.HttpClients.Abstractions;
@@ -83,13 +83,13 @@ public class TaskClient(HttpClient httpClient, ILogger<TaskClient> logger, IOpti
         throw new MissingTaskException();
     }
 
-    public async Task<AnswerResponse> SendAnswerAsync(string token, string answer, CancellationToken cancellationToken = default)
+    public async Task<AnswerResponse> SendAnswerAsync<TModel>(string token, TModel answer, CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(token, nameof(token));
         CustomArgumentExceptionExtensions.ThrowIfNull(answer, nameof(answer));
 
         var uri = CreateRelativeUri($"answer/{token}");
-        var request = new AnswerRequest(answer);
+        var request = new AnswerRequest<TModel>(answer);
 
         try
         {

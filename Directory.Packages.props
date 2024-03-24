@@ -2,7 +2,7 @@
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
- <ItemGroup>
+  <ItemGroup>
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="8.0.3" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.5.0" />
