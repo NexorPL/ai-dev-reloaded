@@ -1,0 +1,8 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/src/AI.Devs.Reloaded.API/bin/Debug/net8.0
+/src/AI.Devs.Reloaded.API/obj
+/.vs
+/src/AI.Devs.Reloaded.API/appsettings.Development.json
