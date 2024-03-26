@@ -9,7 +9,7 @@ builder.Services
     .AddOptions()
     .AddEndpointsApiExplorer()
     .AddSwaggerGen()
-    .AddTaskClient(builder.Configuration);
+    .AddCustomHttpClients(builder.Configuration);
 
 var app = builder.Build();
 
@@ -20,5 +20,5 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.AddTasks();
+app.AddTaskEndpoints();
 app.Run();

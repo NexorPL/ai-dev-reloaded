@@ -1,14 +1,10 @@
-﻿using System.Text.Json;
-using AI.Devs.Reloaded.API.HttpClients.Abstractions;
-using AI.Devs.Reloaded.API.Models.OpenAi;
-using AI.Devs.Reloaded.API.Models.OpenAi.Extensions;
-using AI.Devs.Reloaded.API.Utils;
+﻿using AI.Devs.Reloaded.API.HttpClients.Abstractions;
 
 namespace AI.Devs.Reloaded.API.Tasks;
 
 public static class TasksModules
 {
-    public static void AddTasks(this IEndpointRouteBuilder app)
+    public static void AddTaskEndpoints(this IEndpointRouteBuilder app)
     {
         app.MapGet(
             "/helloapi",
@@ -36,6 +32,13 @@ public static class TasksModules
             async (IOpenAiClient openAiClient, ITaskClient client, CancellationToken ct) => await Liar(openAiClient, client, ct)
         )
         .WithName("liar")
+        .WithOpenApi();
+
+        app.MapGet(
+            "/inprompt",
+            async (IOpenAiClient openAiClient, ITaskClient client, CancellationToken ct) => await Inprompt(openAiClient, client, ct)
+        )
+        .WithName("inprompt")
         .WithOpenApi();
     }
 
@@ -81,11 +84,11 @@ public static class TasksModules
 
         var token = await client.GetTokenAsync("blogger", linkedCts.Token);
         var task = await client.GetTaskAsync(token, linkedCts.Token);
-        var input = string.Join(". ", task.blog!);
-        var response = await openAiClient.CompletionsAsync(input, linkedCts.Token);
-        var contentJson = response.choices.Single(x => x.message.role == "assistant").message.content;
-        var content = JsonSerializer.Deserialize<List<BloggerRsponse>>(contentJson);
-        var answers = content!.AsTextList();
+        var messages = BlogHelper.PrepareData(task);
+
+        var response = await openAiClient.CompletionsAsync(messages, linkedCts.Token);
+
+        var answers = BlogHelper.PrepareAnswer(response);
         var answer = await client.SendAnswerAsync(token, answers, linkedCts.Token);
 
         return Results.Ok(answer);
@@ -109,6 +112,28 @@ public static class TasksModules
         var content = response.choices.Single(x => x.message.role == "assistant").message.content;
         var answer = await client.SendAnswerAsync(token, content, linkedCts.Token);
 
+        return Results.Ok(answer);
+    }
+
+    private static async Task<IResult> Inprompt(IOpenAiClient openAiClient, ITaskClient client, CancellationToken ct = default)
+    {
+        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(60));
+        using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(ct, cts.Token);
+
+        var token = await client.GetTokenAsync("inprompt", linkedCts.Token);
+        var task = await client.GetTaskAsync(token, linkedCts.Token);
+        var messages = InpromptHelper.PrepareData(task);
+
+        var response = await openAiClient.CompletionsAsync(messages, linkedCts.Token);
+
+        var messagesWithSource = InpromptHelper.PrepareDataWithSource(task, response);
+
+        var finalResponse = await openAiClient.CompletionsAsync(messagesWithSource, linkedCts.Token);
+
+        var parsedAnswer = InpromptHelper.ParseAnswer(finalResponse);
+
+        var answer = await client.SendAnswerAsync(token, parsedAnswer, linkedCts.Token);
+        
         return Results.Ok(answer);
     }
 }

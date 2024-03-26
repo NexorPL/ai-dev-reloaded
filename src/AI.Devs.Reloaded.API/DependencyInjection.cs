@@ -7,7 +7,7 @@ namespace AI.Devs.Reloaded.API;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddTaskClient(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddCustomHttpClients(this IServiceCollection services, IConfiguration configuration)
     {
         services.Configure<AiDevsApiOptions>(configuration.GetSection(AiDevsApiOptions.AiDevsApi));
         services.Configure<OpenAiApiOptions>(configuration.GetSection(OpenAiApiOptions.OpenAiApi));
