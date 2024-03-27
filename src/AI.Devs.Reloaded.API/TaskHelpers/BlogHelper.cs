@@ -3,6 +3,7 @@ using System.Text.Json;
 using AI.Devs.Reloaded.API.Contracts.AiDevs;
 using AI.Devs.Reloaded.API.Models.OpenAi;
 using AI.Devs.Reloaded.API.Models.OpenAi.Extensions;
+using AI.Devs.Reloaded.API.Utils.Consts;
 
 namespace AI.Devs.Reloaded.API.Tasks;
 
@@ -32,7 +33,7 @@ public static class BlogHelper
 
     public static List<string> PrepareAnswer(Contracts.OpenAi.Completions.Response response)
     {
-        var contentJson = response.choices.Single(x => x.message.role == "assistant").message.content;
+        var contentJson = response.choices.Single(x => x.message.role == OpenAiApi.Roles.Assistant).message.content;
         var content = JsonSerializer.Deserialize<List<BloggerRsponse>>(contentJson);
 
         return content!.AsTextList();

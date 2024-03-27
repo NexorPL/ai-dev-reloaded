@@ -6,7 +6,8 @@ public class OpenAiApi
     {
         public const string
             User = "user",
-            System = "system"
+            System = "system",
+            Assistant = "assistant"
             ;
     }
 

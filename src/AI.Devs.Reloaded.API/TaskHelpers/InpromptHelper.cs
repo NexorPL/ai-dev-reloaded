@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using AI.Devs.Reloaded.API.Contracts.AiDevs;
+using AI.Devs.Reloaded.API.Utils.Consts;
 
 namespace AI.Devs.Reloaded.API.Tasks;
 
@@ -27,7 +28,7 @@ public static class InpromptHelper
         Contracts.OpenAi.Completions.Response openAiResponse
     )
     {
-        var name = openAiResponse.choices.Single(x => x.message.role == "assistant").message.content;
+        var name = openAiResponse.choices.Single(x => x.message.role == OpenAiApi.Roles.Assistant).message.content;
 
         var filteredList = taskResponse.input!.Where(x => x.StartsWith(name, StringComparison.OrdinalIgnoreCase));
 
@@ -58,7 +59,7 @@ public static class InpromptHelper
 
     public static string ParseAnswer(Contracts.OpenAi.Completions.Response openAiResponse)
     {
-        var answer = openAiResponse.choices.Single(x => x.message.role == "assistant").message.content;
+        var answer = openAiResponse.choices.Single(x => x.message.role == OpenAiApi.Roles.Assistant).message.content;
         return answer!;
     }
 }
