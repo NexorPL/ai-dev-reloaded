@@ -18,4 +18,11 @@ public class OpenAiApi
             Gpt4 = "gpt-4"
             ;
     }
+
+    public class TranscriptionModels
+    {
+        public const string
+            Whisper1 = "whisper-1"
+            ;
+    }
 }

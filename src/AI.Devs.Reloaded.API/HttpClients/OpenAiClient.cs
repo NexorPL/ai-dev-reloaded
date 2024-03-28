@@ -1,7 +1,9 @@
-﻿using System.Text;
+﻿using System.Net.Http.Headers;
+using System.Text;
 using System.Text.Json;
 using AI.Devs.Reloaded.API.HttpClients.Abstractions;
 using AI.Devs.Reloaded.API.Utils;
+using static AI.Devs.Reloaded.API.Utils.Consts.OpenAiApi;
 
 namespace AI.Devs.Reloaded.API.HttpClients;
 
@@ -34,7 +36,7 @@ public class OpenAiClient(HttpClient httpClient, ILogger<OpenAiClient> logger) :
             throw new ArgumentNullException(nameof(messages));
         }
 
-        var request = new Contracts.OpenAi.Completions.Request(Utils.Consts.OpenAiApi.ModelsGpt.Gpt4, messages);
+        var request = new Contracts.OpenAi.Completions.Request(Utils.Consts.OpenAiApi.ModelsGpt.Gpt35Turbo, messages);
 
         return await CallOpenAiApi<Contracts.OpenAi.Completions.Response, Contracts.OpenAi.Completions.Request>(
             "v1/chat/completions", 
@@ -103,6 +105,42 @@ public class OpenAiClient(HttpClient httpClient, ILogger<OpenAiClient> logger) :
         catch (Exception ex)
         {
             _logger.LogError(ex, $"{endpoint} - error occured");
+            throw;
+        }
+
+        throw new Exception();
+    }
+
+    public async Task<string> AudioTranscriptionsAsync(Stream stream, CancellationToken cancellationToken)
+    {
+        var uri = UriHelper.CreateRelativeUri("v1/audio/transcriptions");
+
+        try
+        {
+            using var form = new MultipartFormDataContent();
+            var fileContent = new StreamContent(stream);
+            fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse("multipart/form-data");
+
+            form.Add(fileContent, "file", "test.mp3");
+            form.Add(new StringContent(TranscriptionModels.Whisper1), "model");
+
+            var result = await _httpClient.PostAsync(uri, form, cancellationToken);
+
+            if (result.IsSuccessStatusCode)
+            {
+                var content = await result.Content.ReadAsStringAsync(cancellationToken);
+
+                var response = JsonSerializer.Deserialize<Contracts.OpenAi.Transcriptions.Response>(content, _jsonSerializerOptions);
+                return response!.text!;
+            }
+            else
+            {
+                _logger.LogInformation("AudioTranscriptions - Failed");
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "AudioTranscriptions - error occured");
             throw;
         }
 

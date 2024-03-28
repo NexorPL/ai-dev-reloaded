@@ -50,6 +50,13 @@ public static class TasksModules
         .WithName(AiDevsDefs.TaskEndpoints.Embedding.Name)
         .WithOpenApi();
 
+        app.MapGet(
+            AiDevsDefs.TaskEndpoints.Whisper.Endpoint,
+            async (IOpenAiClient openAiClient, ITaskClient client, CancellationToken ct) => await Whisper(openAiClient, client, ct)
+        )
+        .WithName(AiDevsDefs.TaskEndpoints.Whisper.Name)
+        .WithOpenApi();
+
     }
 
     private static async Task<IResult> HelloApi(ITaskClient client, CancellationToken ct = default)
@@ -162,6 +169,28 @@ public static class TasksModules
         var response = await openAiClient.EmbeddingAsync(embeddingResponse.input, embeddingResponse.embedding, linkedCts.Token);
         
         var answer = await client.SendAnswerAsync(token, response.data[0].embedding, linkedCts.Token);
+
+        return Results.Ok(answer);
+    }
+
+    private static async Task<IResult> Whisper(IOpenAiClient openAiClient, ITaskClient client, CancellationToken ct = default)
+    {
+        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(60));
+        using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(ct, cts.Token);
+
+        var token = await client.GetTokenAsync(AiDevsDefs.TaskEndpoints.Whisper.Name, linkedCts.Token);
+        var taskResponse = await client.GetTaskAsync(token, linkedCts.Token);
+
+        var messages = WhisperHelper.PrepareData(taskResponse);
+        var completionResponse = await openAiClient.CompletionsAsync(messages, linkedCts.Token);
+
+        var url = WhisperHelper.ParseResponse(completionResponse);
+
+        using var stream = await client.GetFileAsync(url, linkedCts.Token);
+
+        var answerText = await openAiClient.AudioTranscriptionsAsync(stream, linkedCts.Token);
+
+        var answer = await client.SendAnswerAsync(token, answerText, linkedCts.Token);
 
         return Results.Ok(answer);
     }

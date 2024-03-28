@@ -9,4 +9,5 @@ public interface ITaskClient
     Task<TaskResponse> GetTaskAsync(string token, CancellationToken cancellationToken = default);
     Task<TaskResponse> GetTaskPostAsync(string token, IEnumerable<KeyValuePair<string, string>> content, CancellationToken cancellationToken = default);
     Task<AnswerResponse> SendAnswerAsync<TModel>(string token, TModel answer, CancellationToken cancellationToken = default);
+    Task<Stream> GetFileAsync(string url,  CancellationToken cancellationToken = default);
 }

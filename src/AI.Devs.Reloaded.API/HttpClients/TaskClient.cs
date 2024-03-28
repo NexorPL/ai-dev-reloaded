@@ -153,4 +153,12 @@ public class TaskClient(HttpClient httpClient, ILogger<TaskClient> logger, IOpti
 
         throw new MissingAnswerException();
     }
+
+    public async Task<Stream> GetFileAsync(string url, CancellationToken cancellationToken = default)
+    {
+        var response = await _httpClient.GetAsync(url, cancellationToken);
+        response.EnsureSuccessStatusCode();
+
+        return await response.Content.ReadAsStreamAsync(cancellationToken);
+    }
 }
