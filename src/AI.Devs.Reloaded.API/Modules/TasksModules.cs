@@ -63,6 +63,13 @@ public static class TasksModules
         )
         .WithName(AiDevsDefs.TaskEndpoints.Functions.Name)
         .WithOpenApi();
+
+        app.MapGet(
+            AiDevsDefs.TaskEndpoints.Rodo.Endpoint,
+            async (IOpenAiClient openAiClient, ITaskClient client, CancellationToken ct) => await Rodo(client, ct)
+        )
+        .WithName(AiDevsDefs.TaskEndpoints.Rodo.Name)
+        .WithOpenApi();
     }
 
     private static async Task<IResult> HelloApi(ITaskClient client, CancellationToken ct = default)
@@ -212,6 +219,21 @@ public static class TasksModules
         var function = FunctionsHelper.PrepareFunctionAddUser();
 
         var answer = await client.SendAnswerAsync(token, function, linkedCts.Token);
+
+        return Results.Ok(answer);
+    }
+
+    private static async Task<IResult> Rodo(ITaskClient client, CancellationToken ct = default)
+    {
+        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(60));
+        using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(ct, cts.Token);
+
+        var token = await client.GetTokenAsync(AiDevsDefs.TaskEndpoints.Rodo.Name, linkedCts.Token);
+        var taskResponse = await client.GetTaskAsync(token, linkedCts.Token);
+
+        var message = RodoHelper.PrepareData();
+
+        var answer = await client.SendAnswerAsync(token, message, linkedCts.Token);
 
         return Results.Ok(answer);
     }
