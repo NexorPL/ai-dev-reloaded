@@ -14,6 +14,7 @@ public class AiDevsDefs
         internal static readonly TaskEndpoints Inprompt = new("inprompt");
         internal static readonly TaskEndpoints Embedding = new("embedding");
         internal static readonly TaskEndpoints Whisper = new("whisper");
+        internal static readonly TaskEndpoints Functions = new("functions");
 
         private TaskEndpoints(string name)
         {

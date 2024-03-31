@@ -57,6 +57,12 @@ public static class TasksModules
         .WithName(AiDevsDefs.TaskEndpoints.Whisper.Name)
         .WithOpenApi();
 
+        app.MapGet(
+            AiDevsDefs.TaskEndpoints.Functions.Endpoint,
+            async (ITaskClient client, CancellationToken ct) => await Functions(client, ct)
+        )
+        .WithName(AiDevsDefs.TaskEndpoints.Functions.Name)
+        .WithOpenApi();
     }
 
     private static async Task<IResult> HelloApi(ITaskClient client, CancellationToken ct = default)
@@ -191,6 +197,21 @@ public static class TasksModules
         var answerText = await openAiClient.AudioTranscriptionsAsync(stream, linkedCts.Token);
 
         var answer = await client.SendAnswerAsync(token, answerText, linkedCts.Token);
+
+        return Results.Ok(answer);
+    }
+
+    private static async Task<IResult> Functions(ITaskClient client, CancellationToken ct = default)
+    {
+        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(60));
+        using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(ct, cts.Token);
+
+        var token = await client.GetTokenAsync(AiDevsDefs.TaskEndpoints.Functions.Name, linkedCts.Token);
+        var taskResponse = await client.GetTaskAsync(token, linkedCts.Token);
+
+        var function = FunctionsHelper.PrepareFunctionAddUser();
+
+        var answer = await client.SendAnswerAsync(token, function, linkedCts.Token);
 
         return Results.Ok(answer);
     }

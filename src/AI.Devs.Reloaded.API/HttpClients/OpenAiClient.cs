@@ -36,7 +36,7 @@ public class OpenAiClient(HttpClient httpClient, ILogger<OpenAiClient> logger) :
             throw new ArgumentNullException(nameof(messages));
         }
 
-        var request = new Contracts.OpenAi.Completions.Request(Utils.Consts.OpenAiApi.ModelsGpt.Gpt35Turbo, messages);
+        var request = new Contracts.OpenAi.Completions.Request(ModelsGpt.Gpt35Turbo, messages);
 
         return await CallOpenAiApi<Contracts.OpenAi.Completions.Response, Contracts.OpenAi.Completions.Request>(
             "v1/chat/completions", 
@@ -52,12 +52,12 @@ public class OpenAiClient(HttpClient httpClient, ILogger<OpenAiClient> logger) :
         var systemPromptBuilder = new StringBuilder("Your task is to determine true of false sentences according to your knowledge");
         systemPromptBuilder.AppendLine("Your answer is short in one word only YES or NO");
 
-        var systemMessage = new Contracts.OpenAi.Completions.Message(Utils.Consts.OpenAiApi.Roles.System, systemPromptBuilder.ToString());
+        var systemMessage = new Contracts.OpenAi.Completions.Message(Roles.System, systemPromptBuilder.ToString());
 
-        var userMessage = new Contracts.OpenAi.Completions.Message(Utils.Consts.OpenAiApi.Roles.User, input);
+        var userMessage = new Contracts.OpenAi.Completions.Message(Roles.User, input);
 
         var messages = new List<Contracts.OpenAi.Completions.Message>() { systemMessage, userMessage };
-        var request = new Contracts.OpenAi.Completions.Request(Utils.Consts.OpenAiApi.ModelsGpt.Gpt35Turbo, messages);
+        var request = new Contracts.OpenAi.Completions.Request(ModelsGpt.Gpt35Turbo, messages);
 
         return await CallOpenAiApi<Contracts.OpenAi.Completions.Response, Contracts.OpenAi.Completions.Request>(
             "v1/chat/completions",
