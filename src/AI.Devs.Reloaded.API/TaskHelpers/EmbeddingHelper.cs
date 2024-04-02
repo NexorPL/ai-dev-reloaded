@@ -16,8 +16,8 @@ public static class EmbeddingHelper
         systemPromptBuilder.AppendLine("- Read allowed embedding types");
         systemPromptBuilder.AppendLine("- Read only text to embedding");
 
-        var systemMessage = new Contracts.OpenAi.Completions.Message(Utils.Consts.OpenAiApi.Roles.System, systemPromptBuilder.ToString());
-        var userMessage = new Contracts.OpenAi.Completions.Message(Utils.Consts.OpenAiApi.Roles.User, response.msg!);
+        var systemMessage = new Contracts.OpenAi.Completions.Message(OpenAiApi.Roles.System, systemPromptBuilder.ToString());
+        var userMessage = new Contracts.OpenAi.Completions.Message(OpenAiApi.Roles.User, response.msg!);
 
         var messages = new List<Contracts.OpenAi.Completions.Message>() { systemMessage, userMessage };
 

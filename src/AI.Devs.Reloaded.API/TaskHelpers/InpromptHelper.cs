@@ -9,12 +9,12 @@ public static class InpromptHelper
     public static List<Contracts.OpenAi.Completions.Message> PrepareData(TaskResponse response)
     {
         var systemPrompt = new Contracts.OpenAi.Completions.Message(
-            Utils.Consts.OpenAiApi.Roles.System, 
+            OpenAiApi.Roles.System, 
             "Return only NAME"
         );
 
         var userPrompt = new Contracts.OpenAi.Completions.Message(
-            Utils.Consts.OpenAiApi.Roles.User,
+            OpenAiApi.Roles.User,
             response.question!
         );
 
@@ -30,7 +30,7 @@ public static class InpromptHelper
     {
         var name = openAiResponse.choices.Single(x => x.message.role == OpenAiApi.Roles.Assistant).message.content;
 
-        var filteredList = taskResponse.input!.Where(x => x.StartsWith(name, StringComparison.OrdinalIgnoreCase));
+        var filteredList = taskResponse.InputAsList().Where(x => x.StartsWith(name, StringComparison.OrdinalIgnoreCase));
 
         var systemPromptBuilder = new StringBuilder("Your answer is short and percse. Answering only according to sources.");
         systemPromptBuilder.AppendLine("Sources###");
@@ -43,12 +43,12 @@ public static class InpromptHelper
         systemPromptBuilder.AppendLine("###");
 
         var systemPrompt = new Contracts.OpenAi.Completions.Message(
-            Utils.Consts.OpenAiApi.Roles.System,
+            OpenAiApi.Roles.System,
             systemPromptBuilder.ToString()
         );
 
         var userPrompt = new Contracts.OpenAi.Completions.Message(
-            Utils.Consts.OpenAiApi.Roles.User,
+            OpenAiApi.Roles.User,
             taskResponse.question!
         );
 

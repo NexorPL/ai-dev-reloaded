@@ -1,6 +1,7 @@
 ﻿using AI.Devs.Reloaded.API.Configurations;
 using AI.Devs.Reloaded.API.HttpClients;
 using AI.Devs.Reloaded.API.HttpClients.Abstractions;
+using AI.Devs.Reloaded.API.HttpClients.Policies;
 using Microsoft.Extensions.Options;
 
 namespace AI.Devs.Reloaded.API;
@@ -11,12 +12,13 @@ public static class DependencyInjection
     {
         services.Configure<AiDevsApiOptions>(configuration.GetSection(AiDevsApiOptions.AiDevsApi));
         services.Configure<OpenAiApiOptions>(configuration.GetSection(OpenAiApiOptions.OpenAiApi));
+        services.Configure<BrowserAgentOptions>(configuration.GetSection(BrowserAgentOptions.BrowserAgent));
 
         services.AddHttpClient<ITaskClient, TaskClient>((services, httpClient) =>
         {
             var options = services.GetRequiredService<IOptions<AiDevsApiOptions>>().Value;
             httpClient.BaseAddress = new Uri(options.BaseUrl);
-        });
+        }).AddPolicyHandler(RetryPolicy.GetRetryPolicy());
 
         services.AddHttpClient<IOpenAiClient, OpenAiClient>((services, httpClient) =>
         {

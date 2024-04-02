@@ -66,9 +66,16 @@ public static class TasksModules
 
         app.MapGet(
             AiDevsDefs.TaskEndpoints.Rodo.Endpoint,
-            async (IOpenAiClient openAiClient, ITaskClient client, CancellationToken ct) => await Rodo(client, ct)
+            async (ITaskClient client, CancellationToken ct) => await Rodo(client, ct)
         )
         .WithName(AiDevsDefs.TaskEndpoints.Rodo.Name)
+        .WithOpenApi();
+
+        app.MapGet(
+            AiDevsDefs.TaskEndpoints.Scraper.Endpoint,
+            async (IOpenAiClient openAiClient, ITaskClient client, CancellationToken ct) => await Scraper(openAiClient, client, ct)
+        )
+        .WithName(AiDevsDefs.TaskEndpoints.Scraper.Name)
         .WithOpenApi();
     }
 
@@ -94,7 +101,7 @@ public static class TasksModules
 
         var answers = new List<int>();
 
-        foreach (var input in taskResponse.input!)
+        foreach (var input in taskResponse.InputAsList())
         {
             var response = await openAiClient.ModerationAsync(input, linkedCts.Token);
             var anyFlagged = response.results.Any(r => r.Flagged) ? 1 : 0;
@@ -234,6 +241,25 @@ public static class TasksModules
         var message = RodoHelper.PrepareData();
 
         var answer = await client.SendAnswerAsync(token, message, linkedCts.Token);
+
+        return Results.Ok(answer);
+    }
+
+    private static async Task<IResult> Scraper(IOpenAiClient openAiClient, ITaskClient client, CancellationToken ct = default)
+    {
+        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(60));
+        using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(ct, cts.Token);
+
+        var token = await client.GetTokenAsync(AiDevsDefs.TaskEndpoints.Scraper.Name, linkedCts.Token);
+        var taskResponse = await client.GetTaskAsync(token, linkedCts.Token);
+
+        using var stream = await client.GetFileAsync(taskResponse.InputAsString(), linkedCts.Token);
+        var messages = await ScraperHelper.PrepareData(taskResponse, stream);
+
+        var openAiResponse = await openAiClient.CompletionsAsync(messages, linkedCts.Token);
+        var answerAi = ScraperHelper.ParseAnswer(openAiResponse);
+
+        var answer = await client.SendAnswerAsync(token, answerAi, linkedCts.Token);
 
         return Results.Ok(answer);
     }

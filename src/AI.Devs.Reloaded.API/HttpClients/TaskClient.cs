@@ -11,10 +11,11 @@ using Microsoft.Extensions.Options;
 
 namespace AI.Devs.Reloaded.API.HttpClients;
 
-public class TaskClient(HttpClient httpClient, ILogger<TaskClient> logger, IOptions<AiDevsApiOptions> options) : ITaskClient
+public class TaskClient(HttpClient httpClient, ILogger<TaskClient> logger, IOptions<AiDevsApiOptions> options, IOptions<BrowserAgentOptions> browserAgent) : ITaskClient
 {
     private readonly HttpClient _httpClient = httpClient;
     private readonly ILogger<TaskClient> _logger = logger;
+    private readonly IOptions<BrowserAgentOptions> _browserAgent = browserAgent;
     private readonly AiDevsApiOptions _options = options.Value;
 
     public async Task<string> GetTokenAsync(string taskName, CancellationToken cancellationToken = default)
@@ -156,7 +157,10 @@ public class TaskClient(HttpClient httpClient, ILogger<TaskClient> logger, IOpti
 
     public async Task<Stream> GetFileAsync(string url, CancellationToken cancellationToken = default)
     {
-        var response = await _httpClient.GetAsync(url, cancellationToken);
+        var request = new HttpRequestMessage(HttpMethod.Get, url);
+        request.Headers.Add(_browserAgent.Value.Name, _browserAgent.Value.Value);
+
+        var response = await _httpClient.SendAsync(request, cancellationToken);
         response.EnsureSuccessStatusCode();
 
         return await response.Content.ReadAsStreamAsync(cancellationToken);
