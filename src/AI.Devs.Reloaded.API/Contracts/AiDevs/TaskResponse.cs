@@ -11,6 +11,7 @@ public class TaskResponse
     public List<string>? blog { get; set; }
     public string? answer { get; set; }
     public string? question { get; set; }
+    public string? hint { get; set; }
 
     internal List<string> InputAsList()
     {

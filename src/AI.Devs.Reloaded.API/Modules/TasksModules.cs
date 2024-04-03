@@ -1,4 +1,5 @@
 ﻿using AI.Devs.Reloaded.API.HttpClients.Abstractions;
+using AI.Devs.Reloaded.API.Models;
 using AI.Devs.Reloaded.API.TaskHelpers;
 using AI.Devs.Reloaded.API.Utils.Consts;
 
@@ -77,6 +78,13 @@ public static class TasksModules
         )
         .WithName(AiDevsDefs.TaskEndpoints.Scraper.Name)
         .WithOpenApi();
+
+        app.MapGet(
+            AiDevsDefs.TaskEndpoints.Whoami.Endpoint,
+            async (IOpenAiClient openAiClient, ITaskClient client, CancellationToken ct) => await Whoami(openAiClient, client, ct)
+        )
+        .WithName(AiDevsDefs.TaskEndpoints.Whoami.Name)
+        .WithOpenApi();
     }
 
     private static async Task<IResult> HelloApi(ITaskClient client, CancellationToken ct = default)
@@ -137,9 +145,9 @@ public static class TasksModules
         using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(ct, cts.Token);
 
         var question = "Which river flow through Szczecin? Short Answer";
-        var taskParamters = new List<KeyValuePair<string, string>>() 
-        { 
-            new("question", question) 
+        var taskParamters = new List<KeyValuePair<string, string>>()
+        {
+            new("question", question)
         };
 
         var token = await client.GetTokenAsync(AiDevsDefs.TaskEndpoints.Liar.Name, linkedCts.Token);
@@ -170,7 +178,7 @@ public static class TasksModules
         var parsedAnswer = InpromptHelper.ParseAnswer(finalResponse);
 
         var answer = await client.SendAnswerAsync(token, parsedAnswer, linkedCts.Token);
-        
+
         return Results.Ok(answer);
     }
 
@@ -187,7 +195,7 @@ public static class TasksModules
         var embeddingResponse = EmbeddingHelper.ParseResponse(completionResponse);
 
         var response = await openAiClient.EmbeddingAsync(embeddingResponse.input, embeddingResponse.embedding, linkedCts.Token);
-        
+
         var answer = await client.SendAnswerAsync(token, response.data[0].embedding, linkedCts.Token);
 
         return Results.Ok(answer);
@@ -262,5 +270,46 @@ public static class TasksModules
         var answer = await client.SendAnswerAsync(token, answerAi, linkedCts.Token);
 
         return Results.Ok(answer);
+    }
+
+    private static async Task<IResult> Whoami(IOpenAiClient openAiClient, ITaskClient client, CancellationToken ct = default)
+    {
+        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(60));
+        using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(ct, cts.Token);
+
+        var token = await client.GetTokenAsync(AiDevsDefs.TaskEndpoints.Whoami.Name, linkedCts.Token);
+        var taskResponse = await client.GetTaskAsync(token, linkedCts.Token);
+
+        var messages = WhoamiHelper.PrepareData(taskResponse);
+
+        const int tries = 10;
+        int counter = 1;
+        bool knownAnswer = false;
+        var answerAi = string.Empty;
+
+        do
+        {
+            var responseAi = await openAiClient.CompletionsAsync(messages, linkedCts.Token);
+            var localAnswerAi = WhoamiHelper.ParseAnswer(responseAi);
+            knownAnswer = WhoamiHelper.IsCorrectAnswer(localAnswerAi);
+
+            if (knownAnswer)
+            {
+                answerAi = localAnswerAi;
+                break;
+            }
+
+            taskResponse = await client.GetTaskAsync(token, linkedCts.Token);
+            WhoamiHelper.ExtendMessages(messages, localAnswerAi, taskResponse);
+
+        } while (counter++ < tries);
+
+        ArgumentException.ThrowIfNullOrEmpty(answerAi, nameof(answerAi));
+
+        var answer = await client.SendAnswerAsync(token, answerAi, linkedCts.Token);
+
+        var finalResponse = CustomResponseWhoami.CreateFromAnswerResponse(answer, counter, answerAi);
+
+        return Results.Ok(finalResponse);
     }
 }
