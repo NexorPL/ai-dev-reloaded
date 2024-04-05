@@ -1,7 +1,10 @@
-﻿using AI.Devs.Reloaded.API.HttpClients.Abstractions;
+﻿using AI.Devs.Reloaded.API.Contracts.OpenAi.Embedding.Extensions;
+using AI.Devs.Reloaded.API.HttpClients.Abstractions;
 using AI.Devs.Reloaded.API.Models;
+using AI.Devs.Reloaded.API.Services.Abstractions;
 using AI.Devs.Reloaded.API.TaskHelpers;
 using AI.Devs.Reloaded.API.Utils.Consts;
+using Qdrant.Client.Grpc;
 
 namespace AI.Devs.Reloaded.API.Tasks;
 
@@ -84,6 +87,14 @@ public static class TasksModules
             async (IOpenAiClient openAiClient, ITaskClient client, CancellationToken ct) => await Whoami(openAiClient, client, ct)
         )
         .WithName(AiDevsDefs.TaskEndpoints.Whoami.Name)
+        .WithOpenApi();
+
+        app.MapGet(
+            AiDevsDefs.TaskEndpoints.Search.Endpoint,
+            async (IOpenAiClient openAiClient, ITaskClient client, IQdrantService qdrantService, CancellationToken ct) =>
+                await Search(openAiClient, client, qdrantService, ct)
+        )
+        .WithName(AiDevsDefs.TaskEndpoints.Search.Name)
         .WithOpenApi();
     }
 
@@ -311,5 +322,43 @@ public static class TasksModules
         var finalResponse = CustomResponseWhoami.CreateFromAnswerResponse(answer, counter, answerAi);
 
         return Results.Ok(finalResponse);
+    }
+
+    private static async Task<IResult> Search(IOpenAiClient openAiClient, ITaskClient client, IQdrantService qdrantService, CancellationToken ct = default)
+    {
+        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(120));
+        using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(ct, cts.Token);
+
+        var token = await client.GetTokenAsync(AiDevsDefs.TaskEndpoints.Search.Name, linkedCts.Token);
+        var taskResponse = await client.GetTaskAsync(token, linkedCts.Token);
+        var questionEmbedding = await openAiClient.EmbeddingAsync(taskResponse.question!, OpenAiApi.EmbeddingTechniques.TextEmbeddingAda002, linkedCts.Token);
+        var findUrl = taskResponse.UrlFromMsg();
+
+        using var stream = await client.GetFileAsync(findUrl, linkedCts.Token);
+        var archiveAiDevs = await SearchHelper.ConvertToListArchiveAiDevs(stream, linkedCts.Token);
+
+        await qdrantService.TryCreateCollection(linkedCts.Token);
+
+        var pointList = new List<PointStruct>();
+
+        foreach (var row in archiveAiDevs!)
+        {
+            var embeddingResponse = await openAiClient.EmbeddingAsync(row.info, OpenAiApi.EmbeddingTechniques.TextEmbeddingAda002, linkedCts.Token);
+            var point = embeddingResponse.AsPointStruct(row);
+
+            pointList.Add(point);
+        }
+
+        await qdrantService.InsertVectors(pointList, linkedCts.Token);
+
+        var searchUrl = await qdrantService.GetFirstUrlFromSearchResult(
+            [.. questionEmbedding.data[0].embedding], 
+            limit: 1, 
+            cancellationToken: linkedCts.Token
+        );
+
+        var answer = await client.SendAnswerAsync(token, searchUrl, linkedCts.Token);
+
+        return Results.Ok(answer);
     }
 }

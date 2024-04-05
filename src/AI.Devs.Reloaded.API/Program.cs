@@ -9,7 +9,8 @@ builder.Services
     .AddOptions()
     .AddEndpointsApiExplorer()
     .AddSwaggerGen()
-    .AddCustomHttpClients(builder.Configuration);
+    .AddCustomHttpClients(builder.Configuration)
+    .AddServices(builder.Configuration);
 
 var app = builder.Build();
 

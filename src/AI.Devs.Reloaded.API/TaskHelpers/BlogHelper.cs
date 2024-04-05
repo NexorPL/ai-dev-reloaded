@@ -21,10 +21,10 @@ public static class BlogHelper
         systemPromptBuilder.AppendLine("Result return in JSON format");
         systemPromptBuilder.AppendLine("Examples```\r\n- [{\"chapter\": 1, \"text\": \"sample\"}, {\"chapter\": 2, \"text\": \"other sample\"}]");
 
-        var systemMessage = new Contracts.OpenAi.Completions.Message(Utils.Consts.OpenAiApi.Roles.System, systemPromptBuilder.ToString());
+        var systemMessage = new Contracts.OpenAi.Completions.Message(OpenAiApi.Roles.System, systemPromptBuilder.ToString());
 
         var userPrompt = $"Napisz post na bloga o tym jak zrobić pizzę margaritę w 4 rozdziałach: {input}";
-        var userMessage = new Contracts.OpenAi.Completions.Message(Utils.Consts.OpenAiApi.Roles.User, userPrompt);
+        var userMessage = new Contracts.OpenAi.Completions.Message(OpenAiApi.Roles.User, userPrompt);
 
         var messages = new List<Contracts.OpenAi.Completions.Message>() { systemMessage, userMessage };
 

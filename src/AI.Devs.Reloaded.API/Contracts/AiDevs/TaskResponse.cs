@@ -37,4 +37,9 @@ public class TaskResponse
 
         return Convert.ToString(input);
     }
+
+    internal string UrlFromMsg()
+    {
+        return msg![msg!.IndexOf("https://")..];
+    }
 }

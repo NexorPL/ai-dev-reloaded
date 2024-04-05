@@ -2,6 +2,9 @@
 using AI.Devs.Reloaded.API.HttpClients;
 using AI.Devs.Reloaded.API.HttpClients.Abstractions;
 using AI.Devs.Reloaded.API.HttpClients.Policies;
+using AI.Devs.Reloaded.API.Services;
+using AI.Devs.Reloaded.API.Services.Abstractions;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 
 namespace AI.Devs.Reloaded.API;
@@ -26,6 +29,14 @@ public static class DependencyInjection
             httpClient.BaseAddress = new Uri(options.BaseUrl);
             httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", options.ApiKey);
         });
+
+        return services;
+    }
+
+    public static IServiceCollection AddServices(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.Configure<QdrantOptions>(configuration.GetSection(QdrantOptions.Qdrant));
+        services.AddScoped<IQdrantService, QdrantService>();
 
         return services;
     }

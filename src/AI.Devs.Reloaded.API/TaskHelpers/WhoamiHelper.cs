@@ -11,8 +11,8 @@ public static class WhoamiHelper
         systemPrompt.AppendLine("Say ONLY the name and surname of that person ONLY if you know the answer and you are sure for 95%.");
         systemPrompt.AppendLine($"Say \"{DontKnow}\" when you Don't know.");
 
-        var systemMessage = new Contracts.OpenAi.Completions.Message(Utils.Consts.OpenAiApi.Roles.System, systemPrompt.ToString());
-        var userMessage = new Contracts.OpenAi.Completions.Message(Utils.Consts.OpenAiApi.Roles.User, response.hint!);
+        var systemMessage = new Contracts.OpenAi.Completions.Message(OpenAiApi.Roles.System, systemPrompt.ToString());
+        var userMessage = new Contracts.OpenAi.Completions.Message(OpenAiApi.Roles.User, response.hint!);
 
         var messages = new List<Contracts.OpenAi.Completions.Message>() { systemMessage, userMessage };
         return messages;
@@ -31,8 +31,8 @@ public static class WhoamiHelper
 
     public static void ExtendMessages(List<Contracts.OpenAi.Completions.Message> messages, string assistanceText, TaskResponse response)
     {
-        var assistantMessage = new Contracts.OpenAi.Completions.Message(Utils.Consts.OpenAiApi.Roles.Assistant, assistanceText);
-        var userPrompt = new Contracts.OpenAi.Completions.Message(Utils.Consts.OpenAiApi.Roles.User, response.hint!);
+        var assistantMessage = new Contracts.OpenAi.Completions.Message(OpenAiApi.Roles.Assistant, assistanceText);
+        var userPrompt = new Contracts.OpenAi.Completions.Message(OpenAiApi.Roles.User, response.hint!);
 
         messages.Add(assistantMessage);
         messages.Add(userPrompt);

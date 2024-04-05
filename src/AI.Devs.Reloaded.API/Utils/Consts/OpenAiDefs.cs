@@ -25,4 +25,11 @@ public class OpenAiApi
             Whisper1 = "whisper-1"
             ;
     }
+
+    public class EmbeddingTechniques
+    {
+        public const string
+            TextEmbeddingAda002 = "text-embedding-ada-002"
+            ;
+    }
 }
