@@ -5,11 +5,10 @@ using AI.Devs.Reloaded.API.Utils.Consts;
 
 namespace AI.Devs.Reloaded.API.Tasks;
 
-public abstract class TaskSolver<TAnswerModel>(IOpenAiClient openAiClient, ITaskClient client, AiDevsDefs.TaskEndpoints endpoint) : ITaskSolver<TAnswerModel>
+public abstract class TaskSolver<TAnswerModel>(IOpenAiClient openAiClient, ITaskClient client) : ITaskSolver<TAnswerModel>
 {
     protected readonly IOpenAiClient _openAiClient = openAiClient;
     protected readonly ITaskClient _client = client;
-    private readonly AiDevsDefs.TaskEndpoints _endpoint = endpoint;
 
     public virtual async Task<IResult> SolveProblem(CancellationToken ct)
     {
@@ -26,8 +25,10 @@ public abstract class TaskSolver<TAnswerModel>(IOpenAiClient openAiClient, ITask
 
     protected Task<string> GetToken(CancellationToken cancellationToken)
     {
-        return _client.GetTokenAsync(_endpoint.Name, cancellationToken);
+        return _client.GetTokenAsync(GetEndpoint().Name, cancellationToken);
     }
 
     public abstract Task<TAnswerModel> PrepareAnswer(TaskResponse taskResponse, CancellationToken cancellationToken);
+
+    public abstract AiDevsDefs.TaskEndpoints GetEndpoint();
 }

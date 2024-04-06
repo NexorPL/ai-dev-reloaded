@@ -5,8 +5,10 @@ using AI.Devs.Reloaded.API.Utils.Consts;
 
 namespace AI.Devs.Reloaded.API.Tasks;
 
-public class TaskInprompt(IOpenAiClient openAiClient, ITaskClient client) : TaskSolver<string>(openAiClient, client, AiDevsDefs.TaskEndpoints.Inprompt), ITaskInprompt
+public class TaskInprompt(IOpenAiClient openAiClient, ITaskClient client) : TaskSolver<string>(openAiClient, client), ITaskInprompt
 {
+    public override AiDevsDefs.TaskEndpoints GetEndpoint() => AiDevsDefs.TaskEndpoints.Inprompt;
+
     public override async Task<string> PrepareAnswer(TaskResponse taskResponse, CancellationToken cancellationToken)
     {
         var messages = InpromptHelper.PrepareData(taskResponse);

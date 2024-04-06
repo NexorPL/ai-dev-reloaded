@@ -9,9 +9,11 @@ using Qdrant.Client.Grpc;
 
 namespace AI.Devs.Reloaded.API.Tasks;
 
-public class TaskSearch(IOpenAiClient openAiClient, ITaskClient client, IQdrantService qdrantService) : TaskSolver<string>(openAiClient, client, AiDevsDefs.TaskEndpoints.Search), ITaskSearch
+public class TaskSearch(IOpenAiClient openAiClient, ITaskClient client, IQdrantService qdrantService) : TaskSolver<string>(openAiClient, client), ITaskSearch
 {
     private readonly IQdrantService _qdrantService = qdrantService;
+
+    public override AiDevsDefs.TaskEndpoints GetEndpoint() => AiDevsDefs.TaskEndpoints.Search;
 
     public override async Task<string> PrepareAnswer(TaskResponse taskResponse, CancellationToken cancellationToken)
     {

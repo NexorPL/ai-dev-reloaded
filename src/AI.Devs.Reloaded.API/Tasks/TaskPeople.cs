@@ -7,8 +7,10 @@ using AI.Devs.Reloaded.API.Utils.Consts;
 
 namespace AI.Devs.Reloaded.API.Tasks;
 
-public class TaskPeople(IOpenAiClient openAiClient, ITaskClient client) : TaskSolver<string>(openAiClient, client, AiDevsDefs.TaskEndpoints.People), ITaskPeople
+public class TaskPeople(IOpenAiClient openAiClient, ITaskClient client) : TaskSolver<string>(openAiClient, client), ITaskPeople
 {
+    public override AiDevsDefs.TaskEndpoints GetEndpoint() => AiDevsDefs.TaskEndpoints.People;
+
     public override async Task<string> PrepareAnswer(TaskResponse taskResponse, CancellationToken cancellationToken)
     {
         using var stream = await _client.GetFileAsync(taskResponse.data!, cancellationToken);

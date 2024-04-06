@@ -6,8 +6,10 @@ using AI.Devs.Reloaded.API.Utils.Consts;
 
 namespace AI.Devs.Reloaded.API.Tasks;
 
-public class TaskFunctions(IOpenAiClient openAiClient, ITaskClient client) : TaskSolver<object>(openAiClient, client, AiDevsDefs.TaskEndpoints.Functions), ITaskFunctions
+public class TaskFunctions(IOpenAiClient openAiClient, ITaskClient client) : TaskSolver<object>(openAiClient, client), ITaskFunctions
 {
+    public override AiDevsDefs.TaskEndpoints GetEndpoint() => AiDevsDefs.TaskEndpoints.Functions;
+
     public override Task<object> PrepareAnswer(TaskResponse taskResponse, CancellationToken cancellationToken)
     {
         var function = FunctionsHelper.PrepareFunctionAddUser();

@@ -6,8 +6,10 @@ using AI.Devs.Reloaded.API.Utils.Consts;
 
 namespace AI.Devs.Reloaded.API.Tasks;
 
-public class TaskWhisper(IOpenAiClient openAiClient, ITaskClient client) : TaskSolver<string>(openAiClient, client, AiDevsDefs.TaskEndpoints.Whisper), ITaskWhisper
+public class TaskWhisper(IOpenAiClient openAiClient, ITaskClient client) : TaskSolver<string>(openAiClient, client), ITaskWhisper
 {
+    public override AiDevsDefs.TaskEndpoints GetEndpoint() => AiDevsDefs.TaskEndpoints.Whisper;
+
     public override async Task<string> PrepareAnswer(TaskResponse taskResponse, CancellationToken cancellationToken)
     {
         var messages = WhisperHelper.PrepareData(taskResponse);

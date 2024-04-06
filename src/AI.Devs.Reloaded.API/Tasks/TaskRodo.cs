@@ -6,8 +6,10 @@ using AI.Devs.Reloaded.API.Utils.Consts;
 
 namespace AI.Devs.Reloaded.API.Tasks;
 
-public class TaskRodo(IOpenAiClient openAiClient, ITaskClient client) : TaskSolver<string>(openAiClient, client, AiDevsDefs.TaskEndpoints.Rodo), ITaskRodo
+public class TaskRodo(IOpenAiClient openAiClient, ITaskClient client) : TaskSolver<string>(openAiClient, client), ITaskRodo
 {
+    public override AiDevsDefs.TaskEndpoints GetEndpoint() => AiDevsDefs.TaskEndpoints.Rodo;
+
     public override Task<string> PrepareAnswer(TaskResponse taskResponse, CancellationToken cancellationToken)
     {
         var message = RodoHelper.PrepareData();

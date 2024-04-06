@@ -5,9 +5,11 @@ using AI.Devs.Reloaded.API.Utils.Consts;
 
 namespace AI.Devs.Reloaded.API.Tasks;
 
-public class TaskLiar(IOpenAiClient openAiClient, ITaskClient client) : TaskSolver<string>(openAiClient, client, AiDevsDefs.TaskEndpoints.Liar), ITaskLiar
+public class TaskLiar(IOpenAiClient openAiClient, ITaskClient client) : TaskSolver<string>(openAiClient, client), ITaskLiar
 {
     private const string Question = "Which river flow through Szczecin? Short Answer";
+
+    public override AiDevsDefs.TaskEndpoints GetEndpoint() => AiDevsDefs.TaskEndpoints.Liar;
 
     public override async Task<IResult> SolveProblem(CancellationToken ct)
     {

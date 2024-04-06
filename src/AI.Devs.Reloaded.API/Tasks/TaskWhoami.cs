@@ -2,11 +2,14 @@
 using AI.Devs.Reloaded.API.HttpClients.Abstractions;
 using AI.Devs.Reloaded.API.TaskHelpers;
 using AI.Devs.Reloaded.API.Tasks.Abstractions;
+using AI.Devs.Reloaded.API.Utils.Consts;
 
 namespace AI.Devs.Reloaded.API.Tasks;
 
-public class TaskWhoamI(IOpenAiClient openAiClient, ITaskClient client) : TaskSolver<string>(openAiClient, client, Utils.Consts.AiDevsDefs.TaskEndpoints.Whoami), ITaskWhoami
+public class TaskWhoamI(IOpenAiClient openAiClient, ITaskClient client) : TaskSolver<string>(openAiClient, client), ITaskWhoami
 {
+    public override AiDevsDefs.TaskEndpoints GetEndpoint() => AiDevsDefs.TaskEndpoints.Whoami;
+
     public override async Task<string> PrepareAnswer(TaskResponse taskResponse, CancellationToken cancellationToken)
     {
         var messages = WhoamiHelper.PrepareData(taskResponse);
