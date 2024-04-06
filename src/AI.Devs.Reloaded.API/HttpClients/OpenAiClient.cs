@@ -29,6 +29,17 @@ public class OpenAiClient(HttpClient httpClient, ILogger<OpenAiClient> logger) :
             );
     }
 
+    public Task<Contracts.OpenAi.Completions.Response> CompletionsAsync(string systemPrompt, string userPrompt, CancellationToken cancellationToken)
+    {
+        var messages = new List<Contracts.OpenAi.Completions.Message>()
+        {
+            new(Roles.System, systemPrompt),
+            new(Roles.System, userPrompt),
+        };
+
+        return CompletionsAsync(messages, cancellationToken);
+    }
+
     public async Task<Contracts.OpenAi.Completions.Response> CompletionsAsync(List<Contracts.OpenAi.Completions.Message> messages, CancellationToken cancellationToken)
     {
         if (messages is null || !messages.Any())

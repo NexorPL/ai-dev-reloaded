@@ -1,4 +1,5 @@
 ﻿using AI.Devs.Reloaded.API.Contracts.OpenAi.Embedding.Extensions;
+using AI.Devs.Reloaded.API.Extensions;
 using AI.Devs.Reloaded.API.HttpClients.Abstractions;
 using AI.Devs.Reloaded.API.Models;
 using AI.Devs.Reloaded.API.Services.Abstractions;
@@ -95,6 +96,13 @@ public static class TasksModules
                 await Search(openAiClient, client, qdrantService, ct)
         )
         .WithName(AiDevsDefs.TaskEndpoints.Search.Name)
+        .WithOpenApi();
+
+        app.MapGet(
+            AiDevsDefs.TaskEndpoints.People.Endpoint,
+            async (IOpenAiClient openAiClient, ITaskClient client, CancellationToken ct) => await People(openAiClient, client, ct)
+        )
+        .WithName(AiDevsDefs.TaskEndpoints.People.Name)
         .WithOpenApi();
     }
 
@@ -352,12 +360,48 @@ public static class TasksModules
         await qdrantService.InsertVectors(pointList, linkedCts.Token);
 
         var searchUrl = await qdrantService.GetFirstUrlFromSearchResult(
-            [.. questionEmbedding.data[0].embedding], 
-            limit: 1, 
+            [.. questionEmbedding.data[0].embedding],
+            limit: 1,
             cancellationToken: linkedCts.Token
         );
 
         var answer = await client.SendAnswerAsync(token, searchUrl, linkedCts.Token);
+
+        return Results.Ok(answer);
+    }
+
+    private static async Task<IResult> People(IOpenAiClient openAiClient, ITaskClient client, CancellationToken ct = default)
+    {
+        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(60));
+        using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(ct, cts.Token);
+
+        var token = await client.GetTokenAsync(AiDevsDefs.TaskEndpoints.People.Name, linkedCts.Token);
+        var taskResponse = await client.GetTaskAsync(token, linkedCts.Token);
+
+        using var stream = await client.GetFileAsync(taskResponse.data!, linkedCts.Token);
+        var peopleList = await PeopleHelper.ConvertToListPeopleModel(stream, linkedCts.Token);
+        var messages = PeopleHelper.PrepareData(taskResponse);
+
+        var peopleOpenAiResponse = await openAiClient.CompletionsAsync(messages, linkedCts.Token);
+        var peopleResponse = PeopleHelper.ParseResponse(peopleOpenAiResponse);
+
+        var propertyName = peopleResponse.Property;
+        var person = peopleList.FindByFirstAndLastname(peopleResponse);
+        string finalAnswer = "";
+
+        if (peopleResponse.Property.Equals("AboutMe", StringComparison.OrdinalIgnoreCase))
+        {
+            var systemPrompt = PeopleHelper.PrepareSystemPromptAboutMe(person);
+            var aboutMeResponse = await openAiClient.CompletionsAsync(systemPrompt, taskResponse.question!, linkedCts.Token);
+            finalAnswer = aboutMeResponse.choices.Single(x => x.message.role == OpenAiApi.Roles.Assistant).message.content;
+        }
+        else
+        {
+            var property = person!.GetType().GetProperty(propertyName);
+            finalAnswer = property!.GetValue(person!)!.ToString()!;
+        }
+
+        var answer = await client.SendAnswerAsync(token, finalAnswer, linkedCts.Token);
 
         return Results.Ok(answer);
     }

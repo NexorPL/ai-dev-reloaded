@@ -19,6 +19,7 @@ public class AiDevsDefs
         internal static readonly TaskEndpoints Scraper = new("scraper");
         internal static readonly TaskEndpoints Whoami = new("whoami");
         internal static readonly TaskEndpoints Search = new("search");
+        internal static readonly TaskEndpoints People = new("people");
 
         private TaskEndpoints(string name)
         {
