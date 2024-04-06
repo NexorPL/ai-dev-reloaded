@@ -27,10 +27,11 @@ public static class TasksModules
     {
         app.MapGet(
             endpoint.Endpoint,
-            async (TInterface task, CancellationToken ct) => await SolveTask(task, ct))
-            .WithName(endpoint.Name)
-            .WithOpenApi()
-            ;
+            async (TInterface task, CancellationToken ct) => await SolveTask(task, ct)
+        )
+        .WithName(endpoint.Name)
+        .WithOpenApi()
+        ;
     }
 
     private static Task<IResult> SolveTask(ITaskBase task, CancellationToken ct)
