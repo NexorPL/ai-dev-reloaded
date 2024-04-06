@@ -4,7 +4,8 @@ using AI.Devs.Reloaded.API.HttpClients.Abstractions;
 using AI.Devs.Reloaded.API.HttpClients.Policies;
 using AI.Devs.Reloaded.API.Services;
 using AI.Devs.Reloaded.API.Services.Abstractions;
-using Microsoft.Extensions.Configuration;
+using AI.Devs.Reloaded.API.Tasks;
+using AI.Devs.Reloaded.API.Tasks.Abstractions;
 using Microsoft.Extensions.Options;
 
 namespace AI.Devs.Reloaded.API;
@@ -37,6 +38,20 @@ public static class DependencyInjection
     {
         services.Configure<QdrantOptions>(configuration.GetSection(QdrantOptions.Qdrant));
         services.AddScoped<IQdrantService, QdrantService>();
+
+        services.AddScoped<ITaskHelloApi, TaskHelloApi>();
+        services.AddScoped<ITaskModeration, TaskModeration>();
+        services.AddScoped<ITaskBlogger, TaskBlogger>();
+        services.AddScoped<ITaskLiar, TaskLiar>();
+        services.AddScoped<ITaskInprompt, TaskInprompt>();
+        services.AddScoped<ITaskEmbedding, TaskEmbedding>();
+        services.AddScoped<ITaskWhisper, TaskWhisper>();
+        services.AddScoped<ITaskFunctions, TaskFunctions>();
+        services.AddScoped<ITaskRodo, TaskRodo>();
+        services.AddScoped<ITaskScraper, TaskScraper>();
+        services.AddScoped<ITaskWhoami, TaskWhoamI>();
+        services.AddScoped<ITaskSearch, TaskSearch>();
+        services.AddScoped<ITaskPeople, TaskPeople>();
 
         return services;
     }

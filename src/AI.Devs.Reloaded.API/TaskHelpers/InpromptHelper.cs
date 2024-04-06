@@ -10,7 +10,7 @@ public static class InpromptHelper
     {
         var systemPrompt = new Contracts.OpenAi.Completions.Message(
             OpenAiApi.Roles.System, 
-            "Return only NAME"
+            "Return only NAME and nothing more."
         );
 
         var userPrompt = new Contracts.OpenAi.Completions.Message(
@@ -32,7 +32,7 @@ public static class InpromptHelper
 
         var filteredList = taskResponse.InputAsList().Where(x => x.StartsWith(name, StringComparison.OrdinalIgnoreCase));
 
-        var systemPromptBuilder = new StringBuilder("Your answer is short and percse. Answering only according to sources.");
+        var systemPromptBuilder = new StringBuilder("Your answer is short and percise. Answering only according to sources.");
         systemPromptBuilder.AppendLine("Sources###");
 
         foreach (var item in filteredList)
