@@ -20,6 +20,7 @@ public class AiDevsDefs
         internal static readonly TaskEndpoints Whoami = new("whoami");
         internal static readonly TaskEndpoints Search = new("search");
         internal static readonly TaskEndpoints People = new("people");
+        internal static readonly TaskEndpoints Knowledge = new("knowledge");
 
         private TaskEndpoints(string name)
         {

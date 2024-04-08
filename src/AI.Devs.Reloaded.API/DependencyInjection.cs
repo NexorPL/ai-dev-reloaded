@@ -17,6 +17,7 @@ public static class DependencyInjection
         services.Configure<AiDevsApiOptions>(configuration.GetSection(AiDevsApiOptions.AiDevsApi));
         services.Configure<OpenAiApiOptions>(configuration.GetSection(OpenAiApiOptions.OpenAiApi));
         services.Configure<BrowserAgentOptions>(configuration.GetSection(BrowserAgentOptions.BrowserAgent));
+        services.Configure<KnowledgeApiOptions>(configuration.GetSection(KnowledgeApiOptions.KnowledgeApi));
 
         services.AddHttpClient<ITaskClient, TaskClient>((services, httpClient) =>
         {
@@ -30,6 +31,9 @@ public static class DependencyInjection
             httpClient.BaseAddress = new Uri(options.BaseUrl);
             httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", options.ApiKey);
         });
+
+        services.AddHttpClient<ICustomApiClient, CustomApiClient>()
+            .SetHandlerLifetime(TimeSpan.FromSeconds(20));
 
         return services;
     }
@@ -52,6 +56,7 @@ public static class DependencyInjection
         services.AddScoped<ITaskWhoami, TaskWhoamI>();
         services.AddScoped<ITaskSearch, TaskSearch>();
         services.AddScoped<ITaskPeople, TaskPeople>();
+        services.AddScoped<ITaskKnowledge, TaskKnowledge>();
 
         return services;
     }
