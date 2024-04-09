@@ -57,6 +57,7 @@ public static class DependencyInjection
         services.AddScoped<ITaskSearch, TaskSearch>();
         services.AddScoped<ITaskPeople, TaskPeople>();
         services.AddScoped<ITaskKnowledge, TaskKnowledge>();
+        services.AddScoped<ITaskTools, TaskTools>();
 
         return services;
     }

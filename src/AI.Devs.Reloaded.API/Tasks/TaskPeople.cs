@@ -28,7 +28,7 @@ public class TaskPeople(IOpenAiClient openAiClient, ITaskClient client) : TaskSo
         {
             var systemPrompt = PeopleHelper.PrepareSystemPromptAboutMe(person);
             var aboutMeResponse = await _openAiClient.CompletionsAsync(systemPrompt, taskResponse.question!, cancellationToken);
-            finalAnswer = aboutMeResponse.choices.Single(x => x.message.role == OpenAiApi.Roles.Assistant).message.content;
+            finalAnswer = aboutMeResponse.AssistanceFirstMessage;
         }
         else
         {

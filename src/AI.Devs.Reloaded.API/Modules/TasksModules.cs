@@ -21,6 +21,7 @@ public static class TasksModules
         app.MapGetWithOpenApi<ITaskSearch>(AiDevsDefs.TaskEndpoints.Search);
         app.MapGetWithOpenApi<ITaskPeople>(AiDevsDefs.TaskEndpoints.People);
         app.MapGetWithOpenApi<ITaskKnowledge>(AiDevsDefs.TaskEndpoints.Knowledge);
+        app.MapGetWithOpenApi<ITaskTools>(AiDevsDefs.TaskEndpoints.Tools);
     }
 
     public static void MapGetWithOpenApi<TInterface>(this IEndpointRouteBuilder app, AiDevsDefs.TaskEndpoints endpoint)
