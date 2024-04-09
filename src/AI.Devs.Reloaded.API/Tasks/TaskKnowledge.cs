@@ -57,8 +57,8 @@ Jaka jest populacja Polski?
 ###
 ";
 
-        var systemPrompt = new Contracts.OpenAi.Completions.SystemMessage(systemMessage);
-        var userPrompt = new Contracts.OpenAi.Completions.UserMessage(response.question!);
+        var systemPrompt = Contracts.OpenAi.Completions.Message.CreateSystemMessage(systemMessage);
+        var userPrompt = Contracts.OpenAi.Completions.Message.CreateUserMessage(response.question!);
         var messages = new List<Contracts.OpenAi.Completions.Message>() { systemPrompt, userPrompt };
 
         return messages;

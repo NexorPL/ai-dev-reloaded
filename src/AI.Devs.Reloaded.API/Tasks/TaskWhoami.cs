@@ -21,7 +21,7 @@ public class TaskWhoamI(IOpenAiClient openAiClient, ITaskClient client) : TaskSo
         do
         {
             var responseAi = await _openAiClient.CompletionsAsync(messages, cancellationToken);
-            var localAnswerAi = WhoamiHelper.ParseAnswer(responseAi);
+            var localAnswerAi = responseAi.AssistanceFirstMessage;
             bool knownAnswer = WhoamiHelper.IsCorrectAnswer(localAnswerAi);
 
             if (knownAnswer)

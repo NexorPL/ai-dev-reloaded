@@ -1,8 +1,6 @@
 ﻿using System.Text;
-using System.Text.Json;
 using AI.Devs.Reloaded.API.Contracts.AiDevs;
 using AI.Devs.Reloaded.API.Models.OpenAi;
-using AI.Devs.Reloaded.API.Utils.Consts;
 
 namespace AI.Devs.Reloaded.API.TaskHelpers;
 
@@ -16,8 +14,8 @@ public static class EmbeddingHelper
         systemPromptBuilder.AppendLine("- Read allowed embedding types");
         systemPromptBuilder.AppendLine("- Read only text to embedding");
 
-        var systemMessage = new Contracts.OpenAi.Completions.Message(OpenAiApi.Roles.System, systemPromptBuilder.ToString());
-        var userMessage = new Contracts.OpenAi.Completions.Message(OpenAiApi.Roles.User, response.msg!);
+        var systemMessage = Contracts.OpenAi.Completions.Message.CreateSystemMessage(systemPromptBuilder.ToString());
+        var userMessage = Contracts.OpenAi.Completions.Message.CreateUserMessage(response.msg!);
 
         var messages = new List<Contracts.OpenAi.Completions.Message>() { systemMessage, userMessage };
 
@@ -26,8 +24,7 @@ public static class EmbeddingHelper
 
     public static EmbeddingResponse ParseResponse(Contracts.OpenAi.Completions.Response response)
     {
-        var content = response.choices.Single(x => x.message.role == OpenAiApi.Roles.Assistant).message.content;
-        var embeddingResponse = JsonSerializer.Deserialize<EmbeddingResponse>(content);
+        var embeddingResponse = response.DeserializeToModel<EmbeddingResponse>();
 
         return embeddingResponse!;
     }

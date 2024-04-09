@@ -17,7 +17,6 @@ public class TaskInprompt(IOpenAiClient openAiClient, ITaskClient client) : Task
         var messagesWithSource = InpromptHelper.PrepareDataWithSource(taskResponse, response);
         var finalResponse = await _openAiClient.CompletionsAsync(messagesWithSource, cancellationToken);
 
-        var parsedAnswer = InpromptHelper.ParseAnswer(finalResponse);
-        return parsedAnswer;
+        return finalResponse.AssistanceFirstMessage;
     }
 }

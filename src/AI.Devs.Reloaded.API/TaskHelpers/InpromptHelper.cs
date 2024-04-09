@@ -8,16 +8,8 @@ public static class InpromptHelper
 {
     public static List<Contracts.OpenAi.Completions.Message> PrepareData(TaskResponse response)
     {
-        var systemPrompt = new Contracts.OpenAi.Completions.Message(
-            OpenAiApi.Roles.System, 
-            "Return only NAME and nothing more."
-        );
-
-        var userPrompt = new Contracts.OpenAi.Completions.Message(
-            OpenAiApi.Roles.User,
-            response.question!
-        );
-
+        var systemPrompt = Contracts.OpenAi.Completions.Message.CreateSystemMessage("Return only NAME and nothing more.");
+        var userPrompt = Contracts.OpenAi.Completions.Message.CreateUserMessage(response.question!);
         var messages = new List<Contracts.OpenAi.Completions.Message>() { systemPrompt, userPrompt };
 
         return messages;
@@ -42,24 +34,10 @@ public static class InpromptHelper
 
         systemPromptBuilder.AppendLine("###");
 
-        var systemPrompt = new Contracts.OpenAi.Completions.Message(
-            OpenAiApi.Roles.System,
-            systemPromptBuilder.ToString()
-        );
-
-        var userPrompt = new Contracts.OpenAi.Completions.Message(
-            OpenAiApi.Roles.User,
-            taskResponse.question!
-        );
-
+        var systemPrompt = Contracts.OpenAi.Completions.Message.CreateSystemMessage(systemPromptBuilder.ToString());
+        var userPrompt = Contracts.OpenAi.Completions.Message.CreateUserMessage(taskResponse.question!);
         var messages = new List<Contracts.OpenAi.Completions.Message>() { systemPrompt, userPrompt };
 
         return messages;
-    }
-
-    public static string ParseAnswer(Contracts.OpenAi.Completions.Response openAiResponse)
-    {
-        var answer = openAiResponse.choices.Single(x => x.message.role == OpenAiApi.Roles.Assistant).message.content;
-        return answer!;
     }
 }

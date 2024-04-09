@@ -1,6 +1,7 @@
 ﻿using AI.Devs.Reloaded.API.Contracts.AiDevs;
 using AI.Devs.Reloaded.API.Extensions;
 using AI.Devs.Reloaded.API.HttpClients.Abstractions;
+using AI.Devs.Reloaded.API.Models.OpenAi;
 using AI.Devs.Reloaded.API.TaskHelpers;
 using AI.Devs.Reloaded.API.Tasks.Abstractions;
 using AI.Devs.Reloaded.API.Utils.Consts;
@@ -18,8 +19,7 @@ public class TaskPeople(IOpenAiClient openAiClient, ITaskClient client) : TaskSo
         var messages = PeopleHelper.PrepareData(taskResponse);
 
         var peopleOpenAiResponse = await _openAiClient.CompletionsAsync(messages, cancellationToken);
-        var peopleResponse = PeopleHelper.ParseResponse(peopleOpenAiResponse);
-
+        var peopleResponse = peopleOpenAiResponse.DeserializeToModel<PeopleResponse>();
         var propertyName = peopleResponse.Property;
         var person = peopleList.FindByFirstAndLastname(peopleResponse);
         string finalAnswer = "";

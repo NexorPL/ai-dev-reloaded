@@ -33,8 +33,8 @@ public class OpenAiClient(HttpClient httpClient, ILogger<OpenAiClient> logger) :
     {
         var messages = new List<Contracts.OpenAi.Completions.Message>()
         {
-            new(Roles.System, systemPrompt),
-            new(Roles.System, userPrompt),
+            Contracts.OpenAi.Completions.Message.CreateSystemMessage(systemPrompt),
+            Contracts.OpenAi.Completions.Message.CreateUserMessage(userPrompt),
         };
 
         return CompletionsAsync(messages, cancellationToken);
@@ -63,10 +63,8 @@ public class OpenAiClient(HttpClient httpClient, ILogger<OpenAiClient> logger) :
         var systemPromptBuilder = new StringBuilder("Your task is to determine true of false sentences according to your knowledge");
         systemPromptBuilder.AppendLine("Your answer is short in one word only YES or NO");
 
-        var systemMessage = new Contracts.OpenAi.Completions.Message(Roles.System, systemPromptBuilder.ToString());
-
-        var userMessage = new Contracts.OpenAi.Completions.Message(Roles.User, input);
-
+        var systemMessage = Contracts.OpenAi.Completions.Message.CreateSystemMessage(systemPromptBuilder.ToString());
+        var userMessage = Contracts.OpenAi.Completions.Message.CreateUserMessage(input);
         var messages = new List<Contracts.OpenAi.Completions.Message>() { systemMessage, userMessage };
         var request = new Contracts.OpenAi.Completions.Request(ModelsGpt.Gpt35Turbo, messages);
 
@@ -103,7 +101,7 @@ public class OpenAiClient(HttpClient httpClient, ILogger<OpenAiClient> logger) :
             {
                 var content = await result.Content.ReadAsStringAsync(cancellationToken);
 
-                _logger.LogInformation($"{endpoint} - Response received from {0}: {1}", uri, content);
+                _logger.LogInformation($"{endpoint} - Response received from {uri}: {content}");
 
                 var response = JsonSerializer.Deserialize<TResponse>(content, _jsonSerializerOptions);
                 return response!;

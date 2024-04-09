@@ -34,18 +34,11 @@ Jaka jest ulubiona postać z kreskówki kapitana bomby Krystyna Krowy?
 {""Firstname"": ""Krystyna"", ""Lastname"": ""Krowa"", ""Property"": ""FavoriteCharacterFromKapitanBomba""}
 ###";
 
-        var systemPrompt = new Contracts.OpenAi.Completions.SystemMessage(systemMessage);
-        var userPrompt = new Contracts.OpenAi.Completions.UserMessage(response.question!);
+        var systemPrompt = Contracts.OpenAi.Completions.Message.CreateSystemMessage(systemMessage);
+        var userPrompt = Contracts.OpenAi.Completions.Message.CreateUserMessage(response.question!);
         var messages = new List<Contracts.OpenAi.Completions.Message>() { systemPrompt, userPrompt };
 
         return messages;
-    }
-
-    public static PeopleResponse ParseResponse(Contracts.OpenAi.Completions.Response response)
-    {
-        var content = response.DeserializeToModel<PeopleResponse>();
-
-        return content!;
     }
 
     public static string PrepareSystemPromptAboutMe(PeopleModel person)

@@ -40,7 +40,7 @@ public class TaskClient(HttpClient httpClient, ILogger<TaskClient> logger, IOpti
             }
             else
             {
-                _logger.LogInformation($"GetToken - Failed to get token: {taskName}");
+                _logger.LogInformation("GetToken - Failed to get token: {0}", taskName);
             }
         }
         catch (Exception ex)
@@ -73,7 +73,7 @@ public class TaskClient(HttpClient httpClient, ILogger<TaskClient> logger, IOpti
             }
             else
             {
-                _logger.LogInformation($"GetTask - Failed to get task");
+                _logger.LogInformation("GetTask - Failed to get task");
             }
         }
         catch (Exception ex)

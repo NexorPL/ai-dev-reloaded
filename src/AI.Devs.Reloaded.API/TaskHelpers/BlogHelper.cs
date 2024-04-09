@@ -1,9 +1,7 @@
 ﻿using System.Text;
-using System.Text.Json;
 using AI.Devs.Reloaded.API.Contracts.AiDevs;
 using AI.Devs.Reloaded.API.Models.OpenAi;
 using AI.Devs.Reloaded.API.Models.OpenAi.Extensions;
-using AI.Devs.Reloaded.API.Utils.Consts;
 
 namespace AI.Devs.Reloaded.API.Tasks;
 
@@ -21,11 +19,10 @@ public static class BlogHelper
         systemPromptBuilder.AppendLine("Result return in JSON format");
         systemPromptBuilder.AppendLine("Examples```\r\n- [{\"chapter\": 1, \"text\": \"sample\"}, {\"chapter\": 2, \"text\": \"other sample\"}]");
 
-        var systemMessage = new Contracts.OpenAi.Completions.Message(OpenAiApi.Roles.System, systemPromptBuilder.ToString());
+        var systemMessage = Contracts.OpenAi.Completions.Message.CreateSystemMessage(systemPromptBuilder.ToString());
 
         var userPrompt = $"Napisz post na bloga o tym jak zrobić pizzę margaritę w 4 rozdziałach: {input}";
-        var userMessage = new Contracts.OpenAi.Completions.Message(OpenAiApi.Roles.User, userPrompt);
-
+        var userMessage = Contracts.OpenAi.Completions.Message.CreateUserMessage(userPrompt);
         var messages = new List<Contracts.OpenAi.Completions.Message>() { systemMessage, userMessage };
 
         return messages;
@@ -33,8 +30,7 @@ public static class BlogHelper
 
     public static List<string> PrepareAnswer(Contracts.OpenAi.Completions.Response response)
     {
-        var contentJson = response.choices.Single(x => x.message.role == OpenAiApi.Roles.Assistant).message.content;
-        var content = JsonSerializer.Deserialize<List<BloggerRsponse>>(contentJson);
+        var content = response.DeserializeToModel<List<BloggerRsponse>>();
 
         return content!.AsTextList();
     }

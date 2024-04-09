@@ -15,7 +15,7 @@ public class TaskWhisper(IOpenAiClient openAiClient, ITaskClient client) : TaskS
         var messages = WhisperHelper.PrepareData(taskResponse);
         var completionResponse = await _openAiClient.CompletionsAsync(messages, cancellationToken);
 
-        var url = WhisperHelper.ParseResponse(completionResponse);
+        var url = completionResponse.AssistanceFirstMessage;
         using var stream = await _client.GetFileAsync(url, cancellationToken);
 
         var answerText = await _openAiClient.AudioTranscriptionsAsync(stream, cancellationToken);

@@ -39,8 +39,8 @@ Examples ###
 {""tool"":""Calendar"",""desc"":""Spotkanie z Marianem"",""date"":""2024-04-10""}
 ###";
 
-        var systemPrompt = new Contracts.OpenAi.Completions.SystemMessage(system);
-        var userPrompt = new Contracts.OpenAi.Completions.UserMessage(response.question!);
+        var systemPrompt = Contracts.OpenAi.Completions.Message.CreateSystemMessage(system);
+        var userPrompt = Contracts.OpenAi.Completions.Message.CreateUserMessage(response.question!);
         var messages = new List<Contracts.OpenAi.Completions.Message>() { systemPrompt, userPrompt };
 
         return messages;

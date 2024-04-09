@@ -16,8 +16,7 @@ public class TaskScraper(IOpenAiClient openAiClient, ITaskClient client) : TaskS
         var messages = await ScraperHelper.PrepareData(taskResponse, stream);
 
         var openAiResponse = await _openAiClient.CompletionsAsync(messages, cancellationToken);
-        var answerAi = ScraperHelper.ParseAnswer(openAiResponse);
 
-        return answerAi;
+        return openAiResponse.AssistanceFirstMessage;
     }
 }

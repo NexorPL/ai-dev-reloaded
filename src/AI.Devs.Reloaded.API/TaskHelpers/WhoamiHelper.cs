@@ -1,5 +1,4 @@
 ﻿using AI.Devs.Reloaded.API.Contracts.AiDevs;
-using AI.Devs.Reloaded.API.Utils.Consts;
 
 namespace AI.Devs.Reloaded.API.TaskHelpers;
 
@@ -11,17 +10,11 @@ public static class WhoamiHelper
         systemPrompt.AppendLine("Say ONLY the name and surname of that person ONLY if you know the answer and you are sure for 95%.");
         systemPrompt.AppendLine($"Say \"{DontKnow}\" when you Don't know.");
 
-        var systemMessage = new Contracts.OpenAi.Completions.Message(OpenAiApi.Roles.System, systemPrompt.ToString());
-        var userMessage = new Contracts.OpenAi.Completions.Message(OpenAiApi.Roles.User, response.hint!);
+        var systemMessage = Contracts.OpenAi.Completions.Message.CreateUserMessage(systemPrompt.ToString());
+        var userMessage = Contracts.OpenAi.Completions.Message.CreateUserMessage(response.hint!);
 
         var messages = new List<Contracts.OpenAi.Completions.Message>() { systemMessage, userMessage };
         return messages;
-    }
-
-    public static string ParseAnswer(Contracts.OpenAi.Completions.Response openAiResponse)
-    {
-        var answer = openAiResponse.choices.Single(x => x.message.role == OpenAiApi.Roles.Assistant).message.content;
-        return answer!;
     }
 
     public static bool IsCorrectAnswer(string aiAnswer)
@@ -31,8 +24,8 @@ public static class WhoamiHelper
 
     public static void ExtendMessages(List<Contracts.OpenAi.Completions.Message> messages, string assistanceText, TaskResponse response)
     {
-        var assistantMessage = new Contracts.OpenAi.Completions.Message(OpenAiApi.Roles.Assistant, assistanceText);
-        var userPrompt = new Contracts.OpenAi.Completions.Message(OpenAiApi.Roles.User, response.hint!);
+        var assistantMessage = Contracts.OpenAi.Completions.Message.CreateAssistantMessage(assistanceText);
+        var userPrompt = Contracts.OpenAi.Completions.Message.CreateUserMessage(response.hint!);
 
         messages.Add(assistantMessage);
         messages.Add(userPrompt);

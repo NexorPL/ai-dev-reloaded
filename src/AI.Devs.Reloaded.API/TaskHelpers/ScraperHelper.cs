@@ -16,24 +16,10 @@ public static class ScraperHelper
         promptBuilder.AppendLine(source);
         promptBuilder.AppendLine("###");
 
-        var sysPrompt = new Contracts.OpenAi.Completions.Message(
-            OpenAiApi.Roles.System,
-            promptBuilder.ToString()
-        );
-
-        var userPrompt = new Contracts.OpenAi.Completions.Message(
-            OpenAiApi.Roles.User,
-            taskResponse.question!
-        );
-
+        var sysPrompt = Contracts.OpenAi.Completions.Message.CreateSystemMessage(promptBuilder.ToString());
+        var userPrompt = Contracts.OpenAi.Completions.Message.CreateUserMessage(taskResponse.question!);
         var messages = new List<Contracts.OpenAi.Completions.Message>() { sysPrompt, userPrompt };
 
         return messages;
-    }
-
-    public static string ParseAnswer(Contracts.OpenAi.Completions.Response openAiResponse)
-    {
-        var answer = openAiResponse.choices.Single(x => x.message.role == OpenAiApi.Roles.Assistant).message.content;
-        return answer!;
     }
 }
