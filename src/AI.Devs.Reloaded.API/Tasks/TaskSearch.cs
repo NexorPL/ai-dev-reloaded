@@ -1,8 +1,9 @@
-﻿using AI.Devs.Reloaded.API.Contracts.AiDevs;
+﻿using System.Text.Json;
+using AI.Devs.Reloaded.API.Contracts.AiDevs;
 using AI.Devs.Reloaded.API.Contracts.OpenAi.Embedding.Extensions;
 using AI.Devs.Reloaded.API.HttpClients.Abstractions;
+using AI.Devs.Reloaded.API.Models;
 using AI.Devs.Reloaded.API.Services.Abstractions;
-using AI.Devs.Reloaded.API.TaskHelpers;
 using AI.Devs.Reloaded.API.Tasks.Abstractions;
 using AI.Devs.Reloaded.API.Utils.Consts;
 using Qdrant.Client.Grpc;
@@ -21,7 +22,9 @@ public class TaskSearch(IOpenAiClient openAiClient, ITaskClient client, IQdrantS
         var findUrl = taskResponse.UrlFromMsg();
 
         using var stream = await _client.GetFileAsync(findUrl, cancellationToken);
-        var archiveAiDevs = await SearchHelper.ConvertToListArchiveAiDevs(stream, cancellationToken);
+        using var reader = new StreamReader(stream);
+        var archiveAiDevsJson = await reader.ReadToEndAsync(cancellationToken);
+        var archiveAiDevs = JsonSerializer.Deserialize<List<ArchiveAiDevs>>(archiveAiDevsJson); 
 
         await _qdrantService.TryCreateCollection(cancellationToken);
 
