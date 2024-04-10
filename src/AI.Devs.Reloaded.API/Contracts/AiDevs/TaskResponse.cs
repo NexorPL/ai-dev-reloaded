@@ -13,6 +13,7 @@ public class TaskResponse
     public string? answer { get; set; }
     public string? question { get; set; }
     public string? hint { get; set; }
+    public string? url { get; set; }
 
     internal List<string> InputAsList()
     {

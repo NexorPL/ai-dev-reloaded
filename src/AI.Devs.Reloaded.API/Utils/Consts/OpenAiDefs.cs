@@ -15,7 +15,8 @@ public class OpenAiApi
     {
         public const string 
             Gpt35Turbo = "gpt-3.5-turbo",
-            Gpt4 = "gpt-4"
+            Gpt4 = "gpt-4",
+            Gpt4Turbo = "gpt-4-turbo"
             ;
     }
 

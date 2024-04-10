@@ -13,7 +13,8 @@ public class OpenAiClient(HttpClient httpClient, ILogger<OpenAiClient> logger) :
     private readonly ILogger<OpenAiClient> _logger = logger;
     private readonly JsonSerializerOptions _jsonSerializerOptions = new()
     {
-        PropertyNameCaseInsensitive = true
+        PropertyNameCaseInsensitive = true,
+        DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
     };
 
     public async Task<Contracts.OpenAi.Moderation.Response> ModerationAsync(string input, CancellationToken cancellationToken = default)
@@ -51,6 +52,21 @@ public class OpenAiClient(HttpClient httpClient, ILogger<OpenAiClient> logger) :
 
         return await CallOpenAiApi<Contracts.OpenAi.Completions.Response, Contracts.OpenAi.Completions.Request>(
             "v1/chat/completions", 
+            request, 
+            cancellationToken
+        );
+    }
+
+    public async Task<Contracts.OpenAi.Completions.Response> CompletionsVisionAsync(List<Contracts.OpenAi.Completions.MessageVision> messages, CancellationToken cancellationToken)
+    {
+        if (messages is null || !messages.Any())
+        {
+            throw new ArgumentNullException(nameof(messages));
+        }
+
+        var request = new Contracts.OpenAi.Completions.RequestVision(ModelsGpt.Gpt4Turbo, messages, 300);
+        return await CallOpenAiApi<Contracts.OpenAi.Completions.Response, Contracts.OpenAi.Completions.RequestVision>(
+            "v1/chat/completions",
             request, 
             cancellationToken
         );
