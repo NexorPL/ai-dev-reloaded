@@ -6,3 +6,8 @@
 /src/AI.Devs.Reloaded.API/obj
 /.vs
 /src/AI.Devs.Reloaded.API/appsettings.Development.json
+/AI.Devs.OwnApi/bin/Debug/net8.0/appsettings.Development.json
+/AI.Devs.OwnApi/bin/Debug/net8.0
+/AI.Devs.OwnApi/obj
+/AI.Devs.OwnApi/AI.Devs.OwnApi.csproj.user
+/AI.Devs.OwnApi/appsettings.Development.json

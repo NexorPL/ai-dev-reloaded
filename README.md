@@ -17,3 +17,12 @@ Here are some helpful links to guide you through this task:
 - [Inserting embeddings](https://qdrant.tech/documentation/concepts/payload/)
 
 To complete this task, I used the [qdrant-dotnet library](https://github.com/qdrant/qdrant-dotnet).
+
+I used ngrok to solve the task OwnAPI is in the AI.Devs.OwnAPi project.
+
+[ngrok](https://ngrok.com/)
+
+1. Download and install the current version of ngrok.
+2. Sign up and retrieve your token from [this page](https://dashboard.ngrok.com/auth).
+3. Launch ngrok and set up the token you got from the website using the command: `ngrok authtoken YOUR_AUTHTOKEN`.
+4. Create a tunnel and execute the command: `ngrok http --host-header=localhost https://localhost:7221`.

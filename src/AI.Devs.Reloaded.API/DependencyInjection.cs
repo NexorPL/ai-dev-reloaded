@@ -18,6 +18,7 @@ public static class DependencyInjection
         services.Configure<OpenAiApiOptions>(configuration.GetSection(OpenAiApiOptions.OpenAiApi));
         services.Configure<BrowserAgentOptions>(configuration.GetSection(BrowserAgentOptions.BrowserAgent));
         services.Configure<KnowledgeApiOptions>(configuration.GetSection(KnowledgeApiOptions.KnowledgeApi));
+        services.Configure<OwnApiOptions>(configuration.GetSection(OwnApiOptions.OwnApi));
 
         services.AddHttpClient<ITaskClient, TaskClient>((services, httpClient) =>
         {
@@ -59,6 +60,7 @@ public static class DependencyInjection
         services.AddScoped<ITaskKnowledge, TaskKnowledge>();
         services.AddScoped<ITaskTools, TaskTools>();
         services.AddScoped<ITaskGnome, TaskGnome>();
+        services.AddScoped<ITaskOwnApi, TaskOwnApi>();
 
         return services;
     }
