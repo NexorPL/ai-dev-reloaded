@@ -24,6 +24,7 @@ public class AiDevsDefs
         internal static readonly TaskEndpoints Tools = new("tools");
         internal static readonly TaskEndpoints Gnome = new("gnome");
         internal static readonly TaskEndpoints Ownapi = new("ownapi");
+        internal static readonly TaskEndpoints Ownapipro = new("ownapipro");
 
         private TaskEndpoints(string name)
         {
