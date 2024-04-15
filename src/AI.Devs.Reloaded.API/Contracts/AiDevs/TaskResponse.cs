@@ -14,6 +14,8 @@ public class TaskResponse
     public string? question { get; set; }
     public string? hint { get; set; }
     public string? url { get; set; }
+    public string? image { get; set; }
+    public string? text { get; set; }
 
     internal List<string> InputAsList()
     {

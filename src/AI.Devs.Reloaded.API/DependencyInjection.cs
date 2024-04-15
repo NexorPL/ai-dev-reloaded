@@ -19,6 +19,7 @@ public static class DependencyInjection
         services.Configure<BrowserAgentOptions>(configuration.GetSection(BrowserAgentOptions.BrowserAgent));
         services.Configure<KnowledgeApiOptions>(configuration.GetSection(KnowledgeApiOptions.KnowledgeApi));
         services.Configure<OwnApiOptions>(configuration.GetSection(OwnApiOptions.OwnApi));
+        services.Configure<RenderFormOptions>(configuration.GetSection(RenderFormOptions.RenderFormApi));
 
         services.AddHttpClient<ITaskClient, TaskClient>((services, httpClient) =>
         {
@@ -35,6 +36,13 @@ public static class DependencyInjection
 
         services.AddHttpClient<ICustomApiClient, CustomApiClient>()
             .SetHandlerLifetime(TimeSpan.FromSeconds(20));
+
+        services.AddHttpClient<IRenderFormClient, RenderFormClient>((services, httpCliet) =>
+        {
+            var options = services.GetRequiredService<IOptions<RenderFormOptions>>().Value;
+            httpCliet.BaseAddress = new Uri(options.BaseUrl);
+            httpCliet.DefaultRequestHeaders.Add("x-api-key", options.ApiKey);
+        });
 
         return services;
     }
@@ -62,6 +70,7 @@ public static class DependencyInjection
         services.AddScoped<ITaskGnome, TaskGnome>();
         services.AddScoped<ITaskOwnApi, TaskOwnApi>();
         services.AddScoped<ITaskOwnApiPro, TaskOwnApiPro>();
+        services.AddScoped<ITaskMeme, TaskMeme>();
 
         return services;
     }

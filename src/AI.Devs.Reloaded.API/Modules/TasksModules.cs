@@ -25,6 +25,7 @@ public static class TasksModules
         app.MapGetWithOpenApi<ITaskGnome>(AiDevsDefs.TaskEndpoints.Gnome);
         app.MapGetWithOpenApi<ITaskOwnApi>(AiDevsDefs.TaskEndpoints.Ownapi);
         app.MapGetWithOpenApi<ITaskOwnApiPro>(AiDevsDefs.TaskEndpoints.Ownapipro);
+        app.MapGetWithOpenApi<ITaskMeme>(AiDevsDefs.TaskEndpoints.Meme);
     }
 
     public static void MapGetWithOpenApi<TInterface>(this IEndpointRouteBuilder app, AiDevsDefs.TaskEndpoints endpoint)
