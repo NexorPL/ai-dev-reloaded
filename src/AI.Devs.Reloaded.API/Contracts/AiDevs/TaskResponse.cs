@@ -16,6 +16,7 @@ public class TaskResponse
     public string? url { get; set; }
     public string? image { get; set; }
     public string? text { get; set; }
+    public string? database { get; set; }
 
     internal List<string> InputAsList()
     {

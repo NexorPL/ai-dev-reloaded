@@ -71,6 +71,7 @@ public static class DependencyInjection
         services.AddScoped<ITaskOwnApi, TaskOwnApi>();
         services.AddScoped<ITaskOwnApiPro, TaskOwnApiPro>();
         services.AddScoped<ITaskMeme, TaskMeme>();
+        services.AddScoped<ITaskOptimaldb, TaskOptimaldb>();
 
         return services;
     }

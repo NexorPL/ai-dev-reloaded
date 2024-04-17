@@ -26,6 +26,7 @@ public class AiDevsDefs
         internal static readonly TaskEndpoints Ownapi = new("ownapi");
         internal static readonly TaskEndpoints Ownapipro = new("ownapipro");
         internal static readonly TaskEndpoints Meme = new("meme");
+        internal static readonly TaskEndpoints Optimaldb = new("optimaldb");
 
         private TaskEndpoints(string name)
         {
