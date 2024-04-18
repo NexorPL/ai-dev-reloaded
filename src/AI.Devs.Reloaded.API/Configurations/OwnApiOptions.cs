@@ -5,4 +5,5 @@ public class OwnApiOptions
     public const string OwnApi = "OwnApi";
     public required string Url { get; set; }
     public required string ProUrl { get; set; }
+    public required string GoogleUrl { get; set; }
 }

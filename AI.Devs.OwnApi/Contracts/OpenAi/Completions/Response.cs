@@ -21,4 +21,11 @@ public sealed record Response(
         var model = JsonSerializer.Deserialize<T>(AssistanceFirstMessage);
         return model!;
     }
+
+    public bool ExistFunctionCalling { 
+        get {
+            var existTool = choices.Single(x => x.message.role == OpenAiApi.Roles.Assistant).message.tool_calls is not null;
+            return existTool;
+            } 
+    }
 };

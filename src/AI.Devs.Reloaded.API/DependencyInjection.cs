@@ -50,8 +50,8 @@ public static class DependencyInjection
     public static IServiceCollection AddServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.Configure<QdrantOptions>(configuration.GetSection(QdrantOptions.Qdrant));
-        services.AddScoped<IQdrantService, QdrantService>();
 
+        services.AddScoped<IQdrantService, QdrantService>();
         services.AddScoped<ITaskHelloApi, TaskHelloApi>();
         services.AddScoped<ITaskModeration, TaskModeration>();
         services.AddScoped<ITaskBlogger, TaskBlogger>();
@@ -72,6 +72,7 @@ public static class DependencyInjection
         services.AddScoped<ITaskOwnApiPro, TaskOwnApiPro>();
         services.AddScoped<ITaskMeme, TaskMeme>();
         services.AddScoped<ITaskOptimaldb, TaskOptimaldb>();
+        services.AddScoped<ITaskGoogle, TaskGoogle>();
 
         return services;
     }

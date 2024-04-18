@@ -10,6 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.Configure<OpenAiApiOptions>(builder.Configuration.GetSection(OpenAiApiOptions.OpenAiApi));
+builder.Services.Configure<SerpApiOptions>(builder.Configuration.GetSection(SerpApiOptions.SerpApi));
 builder.Services.AddHttpClient<IOpenAiClient, OpenAiClient>((services, httpClient) =>
 {
     var options = services.GetRequiredService<IOptions<OpenAiApiOptions>>().Value;
@@ -17,7 +18,14 @@ builder.Services.AddHttpClient<IOpenAiClient, OpenAiClient>((services, httpClien
     httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", options.ApiKey);
 });
 
+builder.Services.AddHttpClient<ISerpClient, SerpClient>((services, httpClient) =>
+{
+    var options = services.GetRequiredService<IOptions<SerpApiOptions>>().Value;
+    httpClient.BaseAddress = new Uri(options.BaseUrl);
+});
+
 builder.Services.AddScoped<IProAnswerService, ProAnswerService>();
+builder.Services.AddScoped<IGoogleAnswerService, GoogleAnswerService>();
 
 var app = builder.Build();
 
@@ -31,6 +39,7 @@ app.MapControllers();
 
 app.MapPost("/answer", async (AI.Devs.OwnApi.Models.AiDevs.Request request, IOpenAiClient client, CancellationToken ct) => await Answer(request, client, ct));
 app.MapPost("/pro/answer", async (AI.Devs.OwnApi.Models.AiDevs.Request request, IProAnswerService service, CancellationToken ct) => await service.ProAnswer(request, ct));
+app.MapPost("/google/answer", async (AI.Devs.OwnApi.Models.AiDevs.Request request, IGoogleAnswerService service, CancellationToken ct) => await service.Answer(request, ct));
 
 app.Run();
 

@@ -1,6 +1,9 @@
-﻿namespace AI.Devs.OwnApi.HttpClients.Abstractions;
+﻿using AI.Devs.OwnApi.Contracts.OpenAi.Completions;
+
+namespace AI.Devs.OwnApi.HttpClients.Abstractions;
 
 public interface IOpenAiClient
 {
-    Task<Contracts.OpenAi.Completions.Response> CompletionsAsync(List<Contracts.OpenAi.Completions.Message> messages, CancellationToken cancellationToken);
+    Task<Response> CompletionsAsync(List<Message> messages, CancellationToken ct);
+    Task<Response> CompletionsAsync(string systemPrompt, string userPrompt, List<Tool> tools, CancellationToken ct);
 }

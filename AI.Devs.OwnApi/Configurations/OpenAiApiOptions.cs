@@ -4,6 +4,6 @@ public class OpenAiApiOptions
 {
     public const string OpenAiApi = "OpenAiApi";
 
-    public string BaseUrl { get; set; } = string.Empty;
-    public string ApiKey { get; set; } = string.Empty;
+    public required string BaseUrl { get; set; }
+    public required string ApiKey { get; set; } 
 }
