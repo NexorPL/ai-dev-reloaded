@@ -73,6 +73,7 @@ public static class DependencyInjection
         services.AddScoped<ITaskMeme, TaskMeme>();
         services.AddScoped<ITaskOptimaldb, TaskOptimaldb>();
         services.AddScoped<ITaskGoogle, TaskGoogle>();
+        services.AddScoped<ITaskMd2html, TaskMd2html>();
 
         return services;
     }

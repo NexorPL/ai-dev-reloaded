@@ -41,6 +41,23 @@ public class OpenAiClient(HttpClient httpClient, ILogger<OpenAiClient> logger) :
         return CompletionsAsync(messages, cancellationToken);
     }
 
+    public async Task<Contracts.OpenAi.Completions.Response> CompletionsAsync(string systemPrompt, string userPrompt, string modelGpt, CancellationToken cancellationToken)
+    {
+        var messages = new List<Contracts.OpenAi.Completions.Message>()
+        {
+            Contracts.OpenAi.Completions.Message.CreateSystemMessage(systemPrompt),
+            Contracts.OpenAi.Completions.Message.CreateUserMessage(userPrompt),
+        };
+
+        var request = new Contracts.OpenAi.Completions.Request(modelGpt, messages);
+
+        return await CallOpenAiApi<Contracts.OpenAi.Completions.Response, Contracts.OpenAi.Completions.Request>(
+            "v1/chat/completions",
+            request,
+            cancellationToken
+        );
+    }
+
     public async Task<Contracts.OpenAi.Completions.Response> CompletionsAsync(List<Contracts.OpenAi.Completions.Message> messages, CancellationToken cancellationToken)
     {
         if (messages is null || !messages.Any())

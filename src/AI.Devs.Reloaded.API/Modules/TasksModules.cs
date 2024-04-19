@@ -28,9 +28,12 @@ public static class TasksModules
         app.MapGetWithOpenApi<ITaskMeme>(AiDevsDefs.TaskEndpoints.Meme);
         app.MapGetWithOpenApi<ITaskOptimaldb>(AiDevsDefs.TaskEndpoints.Optimaldb);
         app.MapGetWithOpenApi<ITaskGoogle>(AiDevsDefs.TaskEndpoints.Google);
+        app.MapGetWithOpenApi<ITaskMd2html>(AiDevsDefs.TaskEndpoints.Md2html, 
+            "To complete this task you need to upload your training file into OpenAi manually. " +
+            "In Service TaskMk2Html set your model GPT name to accomplish this task");
     }
 
-    public static void MapGetWithOpenApi<TInterface>(this IEndpointRouteBuilder app, AiDevsDefs.TaskEndpoints endpoint)
+    public static void MapGetWithOpenApi<TInterface>(this IEndpointRouteBuilder app, AiDevsDefs.TaskEndpoints endpoint, string? description = "")
         where TInterface : ITaskBase
     {
         app.MapGet(
@@ -39,6 +42,7 @@ public static class TasksModules
         )
         .WithName(endpoint.Name)
         .WithOpenApi()
+        .WithDescription(description ?? "")
         ;
     }
 
